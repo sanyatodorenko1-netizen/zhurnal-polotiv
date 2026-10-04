@@ -1,0 +1,123 @@
+<!doctype html>
+  <html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101714">
+  <title>Журнал польотів</title>
+  <style>
+    :root{color-scheme:dark;--bg:#101714;--panel:#19221e;--panel2:#202b26;--line:#34443c;--text:#edf2ed;--muted:#a0b0a6;--accent:#c7f36b;--red:#ff9a8e}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top left,#263a2e 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+    button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{max-width:1240px;margin:auto;padding:32px 22px 56px}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:24px}.eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}h1{font-size:clamp(28px,4vw,40px);line-height:1.1;margin:8px 0}p.sub{color:var(--muted);margin:8px 0 0}.actions{display:flex;gap:10px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:10px 14px;border-radius:10px;font-weight:650}.btn:hover{filter:brightness(1.15)}.btn.primary{background:var(--accent);color:#172014;border-color:var(--accent)}.btn.danger{color:var(--red)}
+    .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.stat,.panel{background:linear-gradient(145deg,#1c2721,#17201c);border:1px solid var(--line);border-radius:15px}.stat{padding:17px 18px}.stat span{display:block;color:var(--muted);font-size:13px}.stat strong{display:block;font-size:28px;margin-top:7px;letter-spacing:-.04em}.layout{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(280px,.75fr);gap:16px}.panel{padding:18px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.panel h2{font-size:17px;margin:0}.filters{display:flex;gap:8px;flex-wrap:wrap}.filters input,.filters select{width:auto;min-width:140px}.field, input,select,textarea{width:100%;background:#101714;color:var(--text);border:1px solid var(--line);border-radius:9px;padding:10px 11px;outline:none}.field:focus,input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+    .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:800px}th{text-align:left;color:var(--muted);font-size:12px;font-weight:650;padding:10px;border-bottom:1px solid var(--line);white-space:nowrap}td{padding:12px 10px;border-bottom:1px solid #2a3730;vertical-align:top}tbody tr:last-child td{border-bottom:0}.tag{display:inline-block;border:1px solid #46584b;border-radius:99px;padding:3px 8px;font-size:12px;color:var(--accent);white-space:nowrap}.subline{font-size:12px;color:var(--muted);margin-top:3px}.icon-btn{background:transparent;border:0;color:var(--muted);padding:4px 7px}.icon-btn:hover{color:var(--red)}.empty{color:var(--muted);text-align:center;padding:28px 8px}.day-list{display:grid;gap:9px}.day-row{display:flex;justify-content:space-between;align-items:center;padding:11px 12px;background:var(--panel2);border-radius:10px}.day-row strong{display:block}.day-row small{color:var(--muted)}.day-row .count{font-size:19px;color:var(--accent);font-weight:750}.note{color:var(--muted);font-size:12px;margin:12px 0 0}
+    dialog{width:min(660px,calc(100% - 24px));max-height:92vh;overflow:auto;background:#19221e;color:var(--text);border:1px solid var(--line);border-radius:16px;padding:0;box-shadow:0 24px 80px #0009}dialog::backdrop{background:#050907c9}.form-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.form-head h2{margin:0}.form-body{padding:18px 22px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.form-grid .wide{grid-column:1/-1}label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}.form-foot{display:flex;justify-content:flex-end;gap:9px;padding:14px 22px;border-top:1px solid var(--line)}
+    .sync-box{margin:0 0 16px}.sync-box p{color:var(--muted);margin:8px 0}.sync-row{display:flex;gap:10px;align-items:end;flex-wrap:wrap}.sync-row>div{flex:1;min-width:180px}.sync-row .btn{height:42px}.sync-state{color:var(--accent);font-size:13px}.sync-error{color:var(--red);font-size:13px}#appContent[hidden]{display:none}
+    @media(max-width:850px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}@media(max-width:520px){.shell{padding:22px 14px 40px}.top{display:block}.actions{margin-top:16px}.stats{gap:8px}.stat{padding:13px}.stat strong{font-size:24px}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.filters>*{flex:1}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="top">
+      <div><div class="eyebrow">Облік рейсів та операцій</div><h1>Журнал польотів</h1><p class="sub">Рейси, вантажі, маршрути та інциденти — в одному місці.</p></div>
+      <div class="actions"><button class="btn" id="exportBtn">Експорт CSV</button><button class="btn primary" id="addBtn">＋ Додати рейс</button></div>
+    </header>
+    <section class="panel sync-box" id="syncPanel">
+      <div id="setupMessage"><h2>Спільна база даних</h2><p>Щоб синхронізувати журнал через інтернет, налаштуйте Supabase та файл конфігурації. Поки що записи зберігаються лише в цьому браузері.</p></div>
+      <form id="loginForm" hidden><h2>Вхід до спільного журналу</h2><p>Увійдіть під обліковим записом, створеним адміністратором.</p><div class="sync-row"><div><label for="loginEmail">Електронна пошта</label><input id="loginEmail" type="email" autocomplete="username" required></div><div><label for="loginPassword">Пароль</label><input id="loginPassword" type="password" autocomplete="current-password" required></div><button class="btn primary" type="submit">Увійти</button></div></form>
+      <div id="signedInBox" hidden><span class="sync-state" id="syncState">Підключено</span> · <span id="signedInEmail"></span> <button class="btn" id="signOutBtn" type="button">Вийти</button></div>
+      <div class="sync-error" id="syncError" role="status"></div>
+    </section>
+    <div id="appContent">
+    <section class="stats" aria-label="Сводка">
+      <div class="stat"><span>Усього рейсів</span><strong id="totalStat">0</strong></div>
+      <div class="stat"><span>За вибраний період</span><strong id="periodStat">0</strong></div>
+      <div class="stat"><span>Доставлено вантажу</span><strong id="weightStat">0 кг</strong></div>
+      <div class="stat"><span>Втрачено бортів</span><strong id="incidentStat">0</strong></div>
+      <div class="stat"><span>Є-бали за період</span><strong id="pointsStat">0</strong></div>
+      <div class="stat"><span>Виїзди НРК</span><strong id="nrkTripsStat">0</strong></div>
+      <div class="stat"><span>Доставлено НРК, кг</span><strong id="nrkWeightStat">0</strong></div>
+      <div class="stat"><span>Завершені місії НРК</span><strong id="nrkSuccessStat">0</strong></div>
+    </section>
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-head"><h2>Записи</h2><div class="filters"><input type="month" id="monthFilter" aria-label="Фільтр за місяцем"><select id="taskFilter" aria-label="Фільтр за завданням"><option value="">Усі завдання</option><option>Доставка</option><option>Бомбардування</option><option>Місія НРК</option><option>Місія «Вампір»</option><option>Медична евакуація</option><option>Спостереження</option><option>Навчальний політ</option><option>Інше</option></select></div></div>
+        <div class="table-wrap"><table><thead><tr><th>Дата</th><th>Завдання</th><th>Борт / тип</th><th>Вантаж / бомби</th><th>Позиція / координати</th><th>Втрачено бортів</th><th></th></tr></thead><tbody id="records"></tbody></table><div id="empty" class="empty" hidden>Записів поки немає. Додайте перший рейс.</div></div>
+      </section>
+      <aside class="panel"><div class="panel-head"><h2>Рейси за днями</h2></div><div id="days" class="day-list"></div><p class="note">Для спільної роботи увійдіть до бази даних. Експортуйте CSV для резервної копії.</p></aside>
+    </div>
+    </div>
+  </main>
+  <dialog id="editor"><form id="flightForm">
+    <div class="form-head"><h2 id="formTitle">Новий рейс</h2><button type="button" class="icon-btn" id="closeBtn" aria-label="Закрити">✕</button></div>
+    <div class="form-body"><input type="hidden" id="recordId"><div class="form-grid">
+      <div><label for="date">Дата *</label><input id="date" type="date" required></div>
+      <div><label for="task">Завдання *</label><select id="task" required><option>Доставка</option><option>Бомбардування</option><option>Місія НРК</option><option>Місія «Вампір»</option><option>Медична евакуація</option><option>Спостереження</option><option>Навчальний політ</option><option>Інше</option></select></div>
+      <div><label for="aircraft">Борт / тип *</label><input id="aircraft" required placeholder="Наприклад, борт 12 · транспортний"></div>
+      <div><label for="cargoType">Тип вантажу</label><input id="cargoType" placeholder="Медикаменти, харчі…"></div>
+      <div><label for="weight">Маса вантажу, кг</label><input id="weight" type="number" min="0" step="0.1" value="0"></div>
+      <div><label for="ePoints">Є-бали</label><input id="ePoints" type="number" min="0" step="1" value="0" placeholder="Кількість за рейс"></div>
+      <div><label for="bombType">Тип бомби</label><input id="bombType" placeholder="Тип боєприпасу"></div>
+      <div><label for="bombWeight">Маса бомби, кг</label><input id="bombWeight" type="number" min="0" step="0.1" value="0"></div>
+      <div><label for="aircraftCount">Бортів у рейсі</label><input id="aircraftCount" type="number" min="1" step="1" value="1"></div>
+      <div><label for="nrkTrips">Виїздів НРК / «Вампіра»</label><input id="nrkTrips" type="number" min="0" step="1" value="0"></div>
+      <div><label for="plannedWeight">Запланована доставка, кг</label><input id="plannedWeight" type="number" min="0" step="0.1" value="0"></div>
+      <div><label for="cargoDelivered">Вантаж доставлено</label><select id="cargoDelivered"><option value="false">Ні</option><option value="true">Так</option></select></div>
+      <div><label for="returnedToBase">Повернувся на базу</label><select id="returnedToBase"><option value="false">Ні</option><option value="true">Так</option></select></div>
+      <div><label for="position">Позиція / пункт відправлення</label><input id="position" placeholder="Назва бази або пункту"></div>
+      <div><label for="destination">Пункт призначення</label><input id="destination" placeholder="Назва пункту доставки"></div>
+      <div><label for="coordinates">Координати маршруту / пункту</label><input id="coordinates" placeholder="Наприклад, 50.4501, 30.5234"></div>
+      <div><label for="incidents">Втрачено бортів</label><input id="incidents" type="number" min="0" step="1" value="0"></div>
+      <div class="wide"><label for="notes">Примітка</label><textarea id="notes" rows="2" placeholder="Додаткова інформація"></textarea></div>
+    </div></div>
+    <div class="form-foot"><button type="button" class="btn" id="cancelBtn">Скасувати</button><button class="btn primary" type="submit">Зберегти рейс</button></div>
+  </form></dialog>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script>
+    const KEY='flight-log-v1';
+    let flights=JSON.parse(localStorage.getItem(KEY)||'[]');
+    const taskTranslations={'Бомбардировка':'Бомбардування','Медицинская эвакуация':'Медична евакуація','Наблюдение':'Спостереження','Учебный полёт':'Навчальний політ','Другое':'Інше'};
+    flights=flights.map(f=>({...f,task:taskTranslations[f.task]||f.task}));
+    const $=id=>document.getElementById(id);
+    const cfg=window.APP_CONFIG||{};
+    const cloudEnabled=!!(window.supabase&&cfg.url&&cfg.key&&!cfg.url.includes('YOUR_')&&!cfg.key.includes('YOUR_'));
+    const cloud=cloudEnabled?window.supabase.createClient(cfg.url,cfg.key):null;
+    let currentUser=null;
+    const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    const formatDate=s=>s?new Date(s+'T00:00:00').toLocaleDateString('uk-UA',{day:'2-digit',month:'short',year:'numeric'}):'—';
+    async function refreshFromCloud(){if(!cloudEnabled||!currentUser)return;const {data,error}=await cloud.from('flight_records').select('id,data').order('updated_at',{ascending:false});if(error){$('syncError').textContent='Не вдалося завантажити спільні записи: '+error.message;return}flights=(data||[]).map(row=>row.data);localStorage.setItem(KEY,JSON.stringify(flights));render();}
+    async function save(record){localStorage.setItem(KEY,JSON.stringify(flights));render();if(cloudEnabled&&currentUser){const {error}=await cloud.from('flight_records').upsert({id:record.id,data:record,updated_at:new Date().toISOString(),updated_by:currentUser.id});if(error){$('syncError').textContent='Не вдалося синхронізувати запис: '+error.message;return} $('syncError').textContent='';}}
+    function updateCloudUI(){if(!cloudEnabled){$('setupMessage').hidden=false;$('loginForm').hidden=true;$('signedInBox').hidden=true;$('appContent').hidden=false;$('syncError').textContent='';return} $('setupMessage').hidden=true;$('loginForm').hidden=!!currentUser;$('signedInBox').hidden=!currentUser;$('appContent').hidden=!currentUser;if(currentUser){$('signedInEmail').textContent=currentUser.email||'';$('syncState').textContent='Підключено до спільної бази';}}
+    $('loginForm').onsubmit=async e=>{e.preventDefault();$('syncError').textContent='';const {error}=await cloud.auth.signInWithPassword({email:$('loginEmail').value,password:$('loginPassword').value});if(error)$('syncError').textContent='Не вдалося увійти: '+error.message;};
+    $('signOutBtn').onclick=()=>cloud.auth.signOut();
+    if(cloudEnabled){cloud.auth.onAuthStateChange((_event,session)=>{currentUser=session?.user||null;updateCloudUI();if(currentUser)refreshFromCloud();else{flights=JSON.parse(localStorage.getItem(KEY)||'[]');render();}});cloud.auth.getSession().then(({data})=>{currentUser=data.session?.user||null;updateCloudUI();if(currentUser)refreshFromCloud();});setInterval(refreshFromCloud,10000);}else updateCloudUI();
+    function render(){
+      const month=$('monthFilter').value, task=$('taskFilter').value;
+      const filtered=flights.filter(f=>(!month||f.date.startsWith(month))&&(!task||f.task===task)).sort((a,b)=>b.date.localeCompare(a.date));
+      $('totalStat').textContent=flights.length;
+      $('periodStat').textContent=filtered.length;
+      $('weightStat').textContent=filtered.reduce((n,f)=>n+(+f.weight||0),0).toLocaleString('uk-UA',{maximumFractionDigits:1})+' кг';
+      $('incidentStat').textContent=filtered.reduce((n,f)=>n+(+f.incidents||0),0);
+      $('pointsStat').textContent=filtered.reduce((n,f)=>n+(+f.ePoints||0),0).toLocaleString('uk-UA');
+      const nrk=filtered.filter(f=>f.task==='Місія НРК');
+      $('nrkTripsStat').textContent=nrk.reduce((n,f)=>n+(+f.nrkTrips||0),0).toLocaleString('uk-UA');
+      $('nrkWeightStat').textContent=nrk.reduce((n,f)=>n+(+f.weight||0),0).toLocaleString('uk-UA',{maximumFractionDigits:1});
+      $('nrkSuccessStat').textContent=nrk.filter(f=>f.cargoDelivered==='true'||f.returnedToBase==='true'||((+f.plannedWeight||0)>0&&(+f.weight||0)>=(+f.plannedWeight||0))).length;
+      $('records').innerHTML=filtered.map(f=>{const isMission=f.task==='Місія НРК'||f.task==='Місія «Вампір»';const delivered=f.cargoDelivered==='true'||((+f.plannedWeight||0)>0&&(+f.weight||0)>=(+f.plannedWeight||0));const success=delivered||f.returnedToBase==='true';const report=[delivered?'Вантаж доставлено':'',f.returnedToBase==='true'?'Повернувся на базу':'',(+f.incidents||0)>0?`Борт втрачено: ${+f.incidents}`:''].filter(Boolean).join(' · ')||'Місія триває';return `<tr><td>${formatDate(f.date)}</td><td><span class="tag">${esc(f.task)}</span><div class="subline">Є-бали: ${(+f.ePoints||0).toLocaleString('uk-UA')}</div>${isMission?`<div class="subline">Виїздів: ${+f.nrkTrips||0} · ${success?'Місію завершено':'Очікує виконання'}</div><div class="subline">${report}</div>`:''}</td><td>${esc(f.aircraft)}<div class="subline">${f.aircraftCount||1} борт.</div></td><td>${esc(f.cargoType||'—')}<div class="subline">Вантаж: ${(+f.weight||0).toLocaleString('uk-UA')} кг</div>${isMission?`<div class="subline">План: ${(+f.plannedWeight||0).toLocaleString('uk-UA')} кг</div>`:`<div class="subline">Бомба: ${esc(f.bombType||'—')} · ${(+f.bombWeight||0).toLocaleString('uk-UA')} кг</div>`}</td><td>${esc(f.position||'—')} → ${esc(f.destination||'—')}<div class="subline">${esc(f.coordinates||'')}</div></td><td>${+f.incidents||0}</td><td><button class="icon-btn" data-edit="${f.id}" title="Змінити">✎</button><button class="icon-btn" data-delete="${f.id}" title="Видалити">⌫</button></td></tr>`}).join('');
+      $('empty').hidden=filtered.length>0;
+      const counts={};filtered.forEach(f=>counts[f.date]=(counts[f.date]||0)+1);
+      const days=Object.entries(counts).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,8);
+      $('days').innerHTML=days.length?days.map(([date,n])=>`<div class="day-row"><div><strong>${formatDate(date)}</strong><small>${n===1?'рейс':n<5?'рейси':'рейсів'}</small></div><span class="count">${n}</span></div>`).join(''):'<div class="empty">Немає даних за цей період</div>';
+    }
+    function resetForm(){ $('flightForm').reset();$('recordId').value='';$('date').value=new Date().toISOString().slice(0,10);$('weight').value='0';$('ePoints').value='0';$('bombWeight').value='0';$('aircraftCount').value='1';$('nrkTrips').value='0';$('plannedWeight').value='0';$('cargoDelivered').value='false';$('returnedToBase').value='false';$('incidents').value='0';$('formTitle').textContent='Новий рейс'; }
+    function openForm(f){resetForm();if(f){$('formTitle').textContent='Змінити рейс';for(const k of ['id','date','task','aircraft','cargoType','weight','ePoints','bombType','bombWeight','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','incidents','notes'])$(k==='id'?'recordId':k).value=f[k]??'';} $('editor').showModal()}
+    $('addBtn').onclick=()=>openForm();$('closeBtn').onclick=$('cancelBtn').onclick=()=>$('editor').close();
+    $('monthFilter').onchange=render;$('taskFilter').onchange=render;
+    $('flightForm').onsubmit=e=>{e.preventDefault();const id=$('recordId').value||crypto.randomUUID();const f={};for(const k of ['date','task','aircraft','cargoType','weight','ePoints','bombType','bombWeight','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','incidents','notes'])f[k]=$(k).value;f.id=id;const i=flights.findIndex(x=>x.id===id);if(i<0)flights.push(f);else flights[i]=f;$('editor').close();save(f)};
+    $('records').onclick=async e=>{const edit=e.target.dataset.edit, del=e.target.dataset.delete;if(edit)openForm(flights.find(f=>f.id===edit));if(del&&confirm('Видалити запис про рейс?')){flights=flights.filter(f=>f.id!==del);localStorage.setItem(KEY,JSON.stringify(flights));render();if(cloudEnabled&&currentUser){const {error}=await cloud.from('flight_records').delete().eq('id',del);if(error)$('syncError').textContent='Не вдалося видалити спільний запис: '+error.message;}}};
+    $('exportBtn').onclick=()=>{const cols=['date','task','aircraft','aircraftCount','cargoType','weight','ePoints','bombType','bombWeight','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','incidents','notes'];const csv=[cols.join(';'),...flights.map(f=>cols.map(k=>'"'+String(f[k]??'').replaceAll('"','""')+'"').join(';'))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-poletiv.csv';a.click();URL.revokeObjectURL(a.href)};
+    render();
+  </script>
+</body>
+</html>
