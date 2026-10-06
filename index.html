@@ -51,7 +51,7 @@
   <main class="shell">
     <header class="top">
       <div><div class="eyebrow">Облік рейсів та операцій</div><h1>Журнал польотів</h1><p class="sub">Рейси, вантажі, маршрути та інциденти — в одному місці.</p></div>
-      <div class="actions"><button class="btn" id="exportBtn">Експорт CSV</button><button class="btn primary" id="addBtn">＋ Додати рейс</button></div>
+      <div class="actions"><button class="btn" id="exportBtn">Експорт XLSX</button><button class="btn primary" id="addBtn">＋ Додати рейс</button></div>
     </header>
     <section class="panel sync-box" id="syncPanel">
       <div class="welcome-layout">
@@ -126,12 +126,21 @@
       <div><label for="starlinkNumber">Номер термінала Starlink</label><input id="starlinkNumber" placeholder="Номер встановленого термінала"></div>
       <div><label for="executor">Виконавець місії</label><input id="executor" placeholder="Наприклад, оператор НРК — ім’я та прізвище"></div>
       <div><label for="ePoints">Є-бали</label><input id="ePoints" type="number" min="0" step="1" value="0" placeholder="Кількість за рейс"></div>
+      <div class="wide" id="nrkReportFields" hidden><div class="form-grid">
+        <div><label for="nrkSuccessfulMissions">Успішні місії НРК</label><input id="nrkSuccessfulMissions" type="number" min="0" step="1" placeholder="Вкажіть кількість, якщо відома"></div>
+        <div><label for="nrkFailedMissions">Неуспішні місії НРК</label><input id="nrkFailedMissions" type="number" min="0" step="1" placeholder="Вкажіть кількість, якщо відома"></div>
+      </div></div>
+      <div class="wide" id="vampireReportFields" hidden><div class="form-grid">
+        <div><label for="vampireFlights">Кількість вильотів VAMPIRE</label><input id="vampireFlights" type="number" min="0" step="1" placeholder="Вкажіть кількість, якщо відома"></div>
+        <div id="targetsHitField"><label for="targetsHit">Уражено цілей</label><input id="targetsHit" type="number" min="0" step="1" placeholder="Вкажіть кількість, якщо відома"></div>
+      </div></div>
       <div class="wide" id="deliveryFields"><div class="form-grid">
         <div><label for="cargoType">Тип вантажу</label><input id="cargoType" placeholder="Медикаменти, харчі…"></div>
         <div><label for="weight">Маса вантажу, кг</label><input id="weight" type="number" min="0" step="0.1" value="0"></div>
         <div><label for="nrkTrips">Кількість виїздів</label><input id="nrkTrips" type="number" min="0" step="1" value="0"></div>
         <div><label for="plannedWeight">Запланована доставка, кг</label><input id="plannedWeight" type="number" min="0" step="0.1" value="0"></div>
         <div><label for="cargoDelivered">Вантаж доставлено</label><select id="cargoDelivered"><option value="false">Ні</option><option value="true">Так</option></select></div>
+        <div id="vampirePackagesField" hidden><label for="packagesDelivered">Доставлено посилок</label><input id="packagesDelivered" type="number" min="0" step="1" placeholder="Вкажіть кількість, якщо відома"></div>
         <div><label for="returnedToBase">Повернувся на базу</label><select id="returnedToBase"><option value="false">Ні</option><option value="true">Так</option></select></div>
         <div><label for="position">Позиція / пункт відправлення</label><input id="position" placeholder="Назва бази або пункту"></div>
         <div><label for="destination">Пункт призначення</label><input id="destination" placeholder="Назва пункту доставки"></div>
@@ -142,6 +151,8 @@
         <div><label for="bombType">Тип БК</label><input id="bombType" placeholder="Тип боєкомплекту"></div>
         <div><label for="bombCount">Кількість підвішених бомб</label><input id="bombCount" type="number" min="0" step="1" value="0"></div>
         <div><label for="bombWeight">Вага БК, кг</label><input id="bombWeight" type="number" min="0" step="0.1" value="0"></div>
+        <div><label for="bombsUsed">Витрачено БК, шт.</label><input id="bombsUsed" type="number" min="0" step="1" placeholder="Кількість фактично застосованих"></div>
+        <div><label for="bombsFailed">З них не розірвалося, шт.</label><input id="bombsFailed" type="number" min="0" step="1" placeholder="Якщо відомо"></div>
         <div><label for="bombCoordinates">Координати бомбардування</label><input id="bombCoordinates" placeholder="Координати цілі"></div>
         <div class="wide"><label>Результат бомбардування</label><div class="impact-options"><label><input type="checkbox" name="impactResults" value="Пошкоджено"> Пошкоджено</label><label><input type="checkbox" name="impactResults" value="Знищено"> Знищено</label><label><input type="checkbox" name="impactResults" value="Уражено"> Уражено</label><label><input type="checkbox" name="impactResults" value="Подавлено"> Подавлено</label></div></div>
       </div></div>
@@ -154,6 +165,7 @@
   <script src="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
+  <script src="assets/flight-report-export.js"></script>
   <script>
     const KEY='flight-log-v1';
     let flights=JSON.parse(localStorage.getItem(KEY)||'[]');
@@ -243,18 +255,18 @@
       $('days').innerHTML=days.length?days.map(([date,n])=>`<div class="day-row"><div><strong>${formatDate(date)}</strong><small>${n===1?'рейс':n<5?'рейси':'рейсів'}</small></div><span class="count">${n}</span></div>`).join(''):'<div class="empty">Немає даних за цей період</div>';
       renderWorkMarkers();
     }
-    function updateTaskFields(){$('bombingFields').hidden=$('task').value!=='Бомбардування';$('deliveryFields').hidden=$('task').value==='Бомбардування';}
+    function updateTaskFields(){const bombing=$('task').value==='Бомбардування',vampire=$('platformKind').value==='Вампір';$('bombingFields').hidden=!bombing;$('deliveryFields').hidden=bombing;$('nrkReportFields').hidden=vampire;$('vampireReportFields').hidden=!vampire;$('vampirePackagesField').hidden=!vampire||bombing;$('targetsHitField').hidden=!vampire||!bombing;}
     function updateTaskChoices(selected='Доставка',legacy=''){const options=['Доставка'];if($('platformKind').value==='Вампір')options.push('Бомбардування');if(legacy&&!options.includes(legacy))options.push(legacy);$('task').innerHTML=options.map(v=>`<option>${esc(v)}</option>`).join('');$('task').value=options.includes(selected)?selected:'Доставка';updateTaskFields();}
     function resetForm(){ $('flightForm').reset();$('recordId').value='';$('date').value=new Date().toISOString().slice(0,10);$('platformKind').value='НРК';updateTaskChoices('Доставка');$('weight').value='0';$('ePoints').value='0';$('bombCount').value='0';$('bombWeight').value='0';$('aircraftCount').value='1';$('nrkTrips').value='0';$('plannedWeight').value='0';$('cargoDelivered').value='false';$('returnedToBase').value='false';$('incidents').value='0';$('formTitle').textContent='Новий рейс'; }
-    function openForm(f){resetForm();if(f){$('formTitle').textContent='Змінити рейс';const kind=f.platformKind||(f.task==='Місія «Вампір»'||String(f.aircraft||'').toLowerCase().includes('вамп')?'Вампір':'НРК');$('platformKind').value=kind;const selected=f.task==='Бомбардування'?'Бомбардування':(f.task==='Доставка'?'Доставка':'Доставка');updateTaskChoices(selected,f.task==='Місія НРК'||f.task==='Місія «Вампір»'?f.task:'');for(const k of ['id','date','startTime','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])$(k==='id'?'recordId':k).value=f[k]??'';document.querySelectorAll('[name="impactResults"]').forEach(el=>el.checked=(f.impactResults||[]).includes(el.value));} $('editor').showModal()}
+    function openForm(f){resetForm();if(f){$('formTitle').textContent='Змінити рейс';const kind=f.platformKind||(f.task==='Місія «Вампір»'||String(f.aircraft||'').toLowerCase().includes('вамп')?'Вампір':'НРК');$('platformKind').value=kind;const selected=f.task==='Бомбардування'?'Бомбардування':(f.task==='Доставка'?'Доставка':'Доставка');updateTaskChoices(selected,f.task==='Місія НРК'||f.task==='Місія «Вампір»'?f.task:'');for(const k of ['id','date','startTime','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombsUsed','bombsFailed','targetsHit','vampireFlights','packagesDelivered','nrkSuccessfulMissions','nrkFailedMissions','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])$(k==='id'?'recordId':k).value=f[k]??'';document.querySelectorAll('[name="impactResults"]').forEach(el=>el.checked=(f.impactResults||[]).includes(el.value));} $('editor').showModal()}
     $('addBtn').onclick=$('emptyAddBtn').onclick=()=>openForm();$('closeBtn').onclick=$('cancelBtn').onclick=()=>$('editor').close();
     $('monthFilter').onchange=render;$('taskFilter').onchange=render;$('platformKind').onchange=()=>updateTaskChoices('Доставка');$('task').onchange=updateTaskFields;
     function showView(name){if(name==='roles'&&currentRole!=='admin')name='overview';activeView=name;document.querySelectorAll('.page-view').forEach(view=>view.hidden=view.id!==name+'View');document.querySelectorAll('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view===name));if(name==='map'){initializeWorldMap();if(agroMap)setTimeout(()=>agroMap.invalidateSize(),120);}}
     document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
     showView('overview');
-    $('flightForm').onsubmit=e=>{e.preventDefault();const id=$('recordId').value;const previous=id?flights.find(x=>x.id===id):null;if(cloudEnabled&&((previous&&!['admin','moderator'].includes(currentRole))||(!previous&&!['admin','executor'].includes(currentRole)))){ $('syncError').textContent='У вашої ролі немає права на цю дію.';return}const recordId=id||crypto.randomUUID();const f={};for(const k of ['date','startTime','platformKind','task','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])f[k]=$(k).value;f.impactResults=[...document.querySelectorAll('[name="impactResults"]:checked')].map(el=>el.value);f.id=recordId;f.created_by=previous?.created_by||currentUser?.id||null;const i=flights.findIndex(x=>x.id===recordId);if(i<0)flights.push(f);else flights[i]=f;$('editor').close();save(f)};
+    $('flightForm').onsubmit=e=>{e.preventDefault();const id=$('recordId').value;const previous=id?flights.find(x=>x.id===id):null;if(cloudEnabled&&((previous&&!['admin','moderator'].includes(currentRole))||(!previous&&!['admin','executor'].includes(currentRole)))){ $('syncError').textContent='У вашої ролі немає права на цю дію.';return}if($('platformKind').value==='Вампір'&&$('task').value==='Бомбардування'&&$('bombsUsed').value!==''&&$('bombsFailed').value!==''&&Number($('bombsFailed').value)>Number($('bombsUsed').value)){alert('Кількість боєприпасів, що не розірвалися, не може перевищувати загальну витрату БК.');return}const recordId=id||crypto.randomUUID();const f={};for(const k of ['date','startTime','platformKind','task','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombsUsed','bombsFailed','targetsHit','vampireFlights','packagesDelivered','nrkSuccessfulMissions','nrkFailedMissions','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])f[k]=$(k).value;f.impactResults=[...document.querySelectorAll('[name="impactResults"]:checked')].map(el=>el.value);f.id=recordId;f.created_by=previous?.created_by||currentUser?.id||null;const i=flights.findIndex(x=>x.id===recordId);if(i<0)flights.push(f);else flights[i]=f;$('editor').close();save(f)};
     $('records').onclick=async e=>{const edit=e.target.dataset.edit, del=e.target.dataset.delete;if(edit)openForm(flights.find(f=>f.id===edit));if(del&&confirm('Видалити запис про рейс?')){flights=flights.filter(f=>f.id!==del);localStorage.setItem(KEY,JSON.stringify(flights));render();if(cloudEnabled&&currentUser){const {error}=await cloud.from('flight_records').delete().eq('id',del);if(error)$('syncError').textContent='Не вдалося видалити спільний запис: '+error.message;}}};
-    $('exportBtn').onclick=()=>{const cols=['date','startTime','platformKind','task','aircraft','platformNumber','starlinkNumber','executor','impactResults','aircraftCount','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombCoordinates','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'];const csv=[cols.join(';'),...flights.map(f=>cols.map(k=>'"'+String(Array.isArray(f[k])?f[k].join(', '):(f[k]??'')).replaceAll('"','""')+'"').join(';'))].join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='zhurnal-poletiv.csv';a.click();URL.revokeObjectURL(a.href)};
+    $('exportBtn').onclick=async()=>{const button=$('exportBtn');const original=button.textContent;button.disabled=true;button.textContent='Формуємо XLSX…';try{await exportFlightReport(flights);}catch(error){console.error('Не вдалося сформувати XLSX-звіт',error);alert(error.message||'Не вдалося сформувати XLSX-звіт. Спробуйте ще раз.');}finally{button.disabled=false;button.textContent=original;}};
     render();
   </script>
 </body>
