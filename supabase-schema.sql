@@ -1,5 +1,3 @@
--- Спільна таблиця записів журналу.
--- Виконайте цей SQL у Supabase Dashboard → SQL Editor.
 create table if not exists public.flight_records (
   id uuid primary key,
   data jsonb not null check (jsonb_typeof(data) = 'object'),
