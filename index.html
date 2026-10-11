@@ -188,7 +188,29 @@
     const roleNames={admin:'Адмін',moderator:'Модератор',executor:'Виконавець',viewer:'Переглядач'};
     const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const formatDate=s=>s?new Date(s+'T00:00:00').toLocaleDateString('uk-UA',{day:'2-digit',month:'short',year:'numeric'}):'—';
-    async function refreshFromCloud(){if(!cloudEnabled||!currentUser||!currentRole)return;const {data,error}=await cloud.from('flight_records').select('id,data,created_by').order('updated_at',{ascending:false});if(error){$('syncError').textContent='Не вдалося завантажити спільні записи: '+error.message;return}flights=(data||[]).map(row=>({...row.data,id:row.id,created_by:row.created_by}));localStorage.setItem(KEY,JSON.stringify(flights));render();}
+    async function refreshFromCloud(){
+      if(!cloudEnabled||!currentUser||!currentRole)return;
+      let {data,error}=await cloud.from('flight_records').select('id,data,created_by').order('updated_at',{ascending:false});
+      if(error){$('syncError').textContent='Не вдалося завантажити спільні записи: '+error.message;return}
+      const cached=JSON.parse(localStorage.getItem(KEY)||'[]');
+      if(!(data||[]).length&&cached.length){
+        const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const now=new Date().toISOString();
+        const rows=cached.map(item=>{
+          const id=uuidPattern.test(String(item.id||''))?item.id:crypto.randomUUID();
+          const record={...item,id,created_by:currentUser.id};
+          return {id,data:record,created_by:currentUser.id,updated_by:currentUser.id,updated_at:now};
+        });
+        const {error:seedError}=await cloud.from('flight_records').upsert(rows);
+        if(seedError){$('syncError').textContent='Не вдалося перенести локальні записи до спільної бази: '+seedError.message;return}
+        ({data,error}=await cloud.from('flight_records').select('id,data,created_by').order('updated_at',{ascending:false}));
+        if(error){$('syncError').textContent='Записи перенесено, але не вдалося оновити список: '+error.message;return}
+      }
+      flights=(data||[]).map(row=>({...row.data,id:row.id,created_by:row.created_by}));
+      localStorage.setItem(KEY,JSON.stringify(flights));
+      $('syncError').textContent='';
+      render();
+    }
     async function loadUserRole(){if(!cloudEnabled||!currentUser)return;currentRole=null;updateCloudUI();const {data,error}=await cloud.from('flight_user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();if(error){$('syncError').textContent='Не вдалося перевірити роль: '+error.message;updateCloudUI();return}currentRole=data?.role||null;updateCloudUI();if(currentRole){await refreshFromCloud();initializeWorldMap();}}
     async function save(record){localStorage.setItem(KEY,JSON.stringify(flights));render();if(cloudEnabled&&currentUser){const {error}=await cloud.from('flight_records').upsert({id:record.id,data:record,created_by:record.created_by,updated_at:new Date().toISOString(),updated_by:currentUser.id});if(error){$('syncError').textContent='Не вдалося синхронізувати запис: '+error.message;return} $('syncError').textContent='';}}
     function updateCloudUI(){document.body.classList.toggle('auth-gate',cloudEnabled&&(!currentUser||passwordRecovery));if(!cloudEnabled){$('setupMessage').hidden=false;$('loginForm').hidden=true;$('resetRequestForm').hidden=true;$('newPasswordForm').hidden=true;$('signedInBox').hidden=true;$('roleManager').hidden=true;$('appContent').hidden=false;$('syncPanel').hidden=false;$('addBtn').hidden=false;$('emptyAddBtn').hidden=false;$('addWorkPointBtn').hidden=false;document.querySelector('[data-view="roles"]').hidden=true;$('syncError').textContent='';initializeWorldMap();return} $('setupMessage').hidden=true;const changingPassword=!!currentUser&&passwordRecovery;$('loginForm').hidden=!!currentUser||$('resetRequestForm').dataset.active==='true';$('resetRequestForm').hidden=!!currentUser||$('resetRequestForm').dataset.active!=='true';$('newPasswordForm').hidden=!changingPassword;$('signedInBox').hidden=!currentUser||changingPassword;$('appContent').hidden=!currentUser||changingPassword;$('syncPanel').hidden=!!currentUser&&!changingPassword&&!$('syncError').textContent;$('roleManager').hidden=currentRole!=='admin';document.querySelector('[data-view="roles"]').hidden=currentRole!=='admin';if(currentRole!=='admin'&&activeView==='roles')showView('overview');$('addBtn').hidden=!['admin','executor'].includes(currentRole);$('emptyAddBtn').hidden=!['admin','executor'].includes(currentRole);$('addWorkPointBtn').hidden=!['admin','executor'].includes(currentRole);if(currentUser&&!changingPassword){$('signedInEmail').textContent=currentUser.email||'Обліковий запис';$('roleLabel').textContent=roleNames[currentRole]||'Роль не призначена';$('syncState').textContent=currentRole?'Підключено до спільної бази':'Очікується призначення ролі';if(currentRole&&/^Доступ до даних очікує|^Зверніться до адміна/.test($('syncError').textContent))$('syncError').textContent='';if(!currentRole&&!$('syncError').textContent)$('syncError').textContent='Доступ до даних очікує на призначення ролі адміністратором.';}}
