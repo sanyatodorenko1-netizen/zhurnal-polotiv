@@ -10,7 +10,7 @@
 
   function numberOrNull(value) {
     if (value == null || text(value) === '') return null;
-    const number = Number(value);
+    const number = Number(typeof value === 'string' ? value.trim().replace(/[\s\u00a0\u202f]/g, '').replace(',', '.') : value);
     return Number.isFinite(number) ? number : null;
   }
 
@@ -126,7 +126,21 @@
     });
     sheet.autoFilter = { from: { row: headingRow, column: 1 }, to: { row: headingRow + rows.length, column: headers.length } };
     sheet.views = [{ state: 'frozen', ySplit: headingRow }];
-    return headingRow + rows.length + 2;
+    const totalsRow = sheet.getRow(headingRow + rows.length + 1);
+    totalsRow.getCell(1).value = 'РАЗОМ';
+    const numericHeaders = new Set(['Виїздів', 'Успішні місії', 'Неуспішні місії', 'Маса вантажу, кг', 'Втрачено бортів', 'Є-бали', 'Вильотів', 'Бортів у записі', 'Доставлено посилок', 'Підвішено бомб, шт.', 'Витрачено БК, шт.', 'Не розірвалося, шт.', 'Вага БК, кг', 'Уражено цілей']);
+    headers.forEach((name, index) => {
+      const cell = totalsRow.getCell(index + 1);
+      styleCell(cell, 'FFE5EEDB', 'FF172014', true);
+      if (!numericHeaders.has(name)) return;
+      const values = rows.map(row => row[index]).filter(value => typeof value === 'number' && Number.isFinite(value));
+      if (!values.length) return;
+      const column = sheet.getColumn(index + 1).letter;
+      cell.value = { formula: 'SUM(' + column + (headingRow + 1) + ':' + column + (headingRow + rows.length) + ')', result: values.reduce((sum, value) => sum + value, 0) };
+      cell.numFmt = '#,##0.##';
+    });
+    totalsRow.height = 30;
+    return headingRow + rows.length + 3;
   }
 
   function addUnavailable(sheet, items, row, lastColumn) {
@@ -155,6 +169,7 @@
     const deliveredWeight = knownSum(deliveredEntries, 'weight');
     const summaryRows = [
       ['Записи журналу', records.length, `${records.length} записів у цьому періоді`],
+      ['Загальна маса вантажу за записами, кг', knownSum(records, 'weight').value, 'Сума заповнених значень незалежно від позначки доставки'],
       ['Загальна кількість виїздів', trips.value, trips.value === null ? 'Поле «Кількість виїздів» не заповнено' : `${trips.known} із ${trips.total} записів мають кількість виїздів`],
       ['Успішні місії', successful.value, successful.value === null ? 'Поле ще не заповнено в записах' : `${successful.known} із ${successful.total} записів мають значення`],
       ['Неуспішні місії', failed.value, failed.value === null ? 'Поле ще не заповнено в записах' : `${failed.known} із ${failed.total} записів мають значення`],
@@ -198,6 +213,7 @@
     const resultRows = IMPACT_LABELS.map(label => [label, bombing.filter(record => Array.isArray(record.impactResults) && record.impactResults.includes(label)).length, 'Кількість записів із цією позначкою; це не кількість цілей']);
     const summaryRows = [
       ['Записи журналу', records.length, `${records.length} записів у цьому періоді`],
+      ['Загальна маса вантажу за записами, кг', knownSum(records, 'weight').value, 'Сума заповнених значень незалежно від позначки доставки'],
       ['Кількість вильотів', flights.value, flights.value === null ? 'Поле ще не заповнено в записах' : `${flights.known} із ${flights.total} записів мають значення`],
       ['Записи доставки з позначкою «Так»', deliveredEntries.length, `${deliveredEntries.length} із ${deliveries.length} записів доставки`],
       ['Доставлено посилок', packages.value, packages.value === null ? 'Поле ще не заповнено в записах доставки' : `${packages.known} із ${packages.total} записів доставки мають значення`],
@@ -244,6 +260,7 @@
     const dates = records.map(record => parseDate(record.date)).filter(Boolean).sort((a, b) => a - b);
     const period = dates.length ? `${dateLabel(dates[0])} — ${dateLabel(dates[dates.length - 1])}` : 'не визначено: у журналі немає дат';
     const workbook = new ExcelJS.Workbook();
+    workbook.calcProperties = { fullCalcOnLoad: true };
     workbook.creator = 'Журнал польотів';
     workbook.subject = `Звітний період ${period}`;
     workbook.created = new Date();
