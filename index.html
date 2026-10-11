@@ -45,6 +45,7 @@
       <button class="side-link" type="button" data-view="records"><span class="side-icon" aria-hidden="true">▤</span><span>Записи рейсів</span></button>
       <button class="side-link" type="button" data-view="statistics"><span class="side-icon" aria-hidden="true">▦</span><span>Статистика</span></button>
       <button class="side-link" type="button" data-view="map"><span class="side-icon" aria-hidden="true">◎</span><span>Карта світу</span></button>
+      <button class="side-link" type="button" data-view="equipment"><span class="side-icon" aria-hidden="true">▣</span><span>Облік техніки</span></button>
       <button class="side-link" type="button" data-view="directories"><span class="side-icon" aria-hidden="true">≡</span><span>Довідники</span></button>
       <button class="side-link" type="button" data-view="roles" hidden><span class="side-icon" aria-hidden="true">⚙</span><span>Керування ролями</span></button>
     </nav>
@@ -112,6 +113,7 @@
       </div>
     </section>
     </section>
+    <section class="page-view" id="equipmentView" hidden><section class="panel"><h2>Облік НРК та «Вампірів»</h2><p class="note">Поточний стан техніки за номерами. Наявні = на ВП + на складі + у ремонті. Фільтри рейсів не змінюють цю сводку.</p><div id="equipmentSummary" class="stats"></div><div class="filters"><select id="equipmentKindFilter" aria-label="Фільтр техніки"><option value="">Уся техніка</option><option>НРК</option><option>Вампір</option></select><select id="equipmentStatusFilter" aria-label="Фільтр стану"><option value="">Усі стани</option><option value="vp">На ВП</option><option value="warehouse">На складі</option><option value="repair">У ремонті</option><option value="lost">Втрачено</option></select><input type="search" id="equipmentSearch" aria-label="Пошук техніки" placeholder="Номер або модель"></div><p id="equipmentNotice" class="note" role="status"></p><div id="equipmentList" class="day-list" style="margin-top:16px"></div></section><section class="panel" id="equipmentEditorPanel" hidden style="margin-top:16px"><h2 id="equipmentFormTitle">Додати техніку</h2><form id="equipmentForm"><input id="equipmentId" type="hidden"><div class="form-grid" style="margin-top:16px"><div><label for="equipmentKind">Платформа</label><select id="equipmentKind"><option>НРК</option><option>Вампір</option></select></div><div><label for="equipmentNumber">Номер *</label><input id="equipmentNumber" maxlength="120" required></div><div><label for="equipmentModel">Тип / модель</label><input id="equipmentModel" maxlength="120"></div><div><label for="equipmentStatus">Статус</label><select id="equipmentStatus"><option value="warehouse">На складі</option><option value="vp">На ВП</option><option value="repair">У ремонті</option><option value="lost">Втрачено</option></select></div><div class="wide"><label for="equipmentNotes">Примітка</label><textarea id="equipmentNotes" maxlength="2000" rows="2"></textarea></div></div><div class="actions" style="margin-top:16px"><button class="btn primary" id="equipmentSave" type="submit">Зберегти</button><button class="btn" id="equipmentNew" type="button">Новий борт</button></div><p id="equipmentSaveStatus" class="note" role="status"></p></form></section></section>
     <section class="page-view" id="directoriesView" hidden><section class="panel"><h2>Довідники для заповнення рейсів</h2><p class="note">Оберіть категорію. Адміністратор додає варіанти, команда вибирає їх у формі рейсу.</p><div class="filters" style="margin-top:16px"><select id="directoryCategory" aria-label="Категорія довідника"></select></div><form id="directoryForm" class="sync-row" hidden style="margin-top:16px"><div><label for="directoryValue">Новий варіант</label><input id="directoryValue" maxlength="120" required placeholder="Введіть назву або номер"></div><button class="btn primary" id="directoryAddBtn" type="submit">Додати</button></form><p id="directoryStatus" class="note" role="status"></p><div id="directoryItems" class="day-list" style="margin-top:16px"></div><hr style="border:0;border-top:1px solid var(--line);margin:24px 0"><h2>Борт → Starlink</h2><p class="note">Зв’язки окремі для НРК та «Вампіра». Історичні записи не змінюються.</p><form id="boardLinkForm" class="sync-row" hidden style="margin-top:16px"><div><label for="linkPlatform">Платформа</label><select id="linkPlatform"><option>НРК</option><option>Вампір</option></select></div><div><label for="linkBoard">Номер борта</label><select id="linkBoard" required></select></div><div><label for="linkTerminal">Starlink</label><select id="linkTerminal"><option value="">Без прив’язки</option></select></div><button class="btn primary" id="saveBoardLink" type="submit">Зберегти зв’язок</button></form><p id="boardLinkStatus" class="note" role="status"></p><div id="boardLinkList" class="day-list"></div></section></section>
     <section class="page-view" id="rolesView" hidden><section class="panel" id="roleManager" hidden><h2>Керування ролями</h2><p>Введіть email зареєстрованого користувача та призначте йому роль.</p><form id="roleForm" class="sync-row"><div><label for="roleEmail">Email користувача</label><input id="roleEmail" type="email" required></div><div><label for="roleSelect">Роль</label><select id="roleSelect"><option value="moderator">Модератор</option><option value="executor">Виконавець</option><option value="viewer">Переглядач</option><option value="admin">Адмін</option></select></div><button class="btn primary" type="submit">Зберегти роль</button></form><div id="roleMessage" class="sync-error" role="status"></div></section></section>
     </div>
@@ -181,6 +183,10 @@
     const cloudEnabled=!!(window.supabase&&cfg.url&&cfg.key&&!cfg.url.includes('YOUR_')&&!cfg.key.includes('YOUR_'));
     const cloud=cloudEnabled?window.supabase.createClient(cfg.url,cfg.key):null;
     const directoryFields={executor:'Виконавці',cargoType:'Типи вантажу',destination:'Пункти призначення',position:'Пункти відправлення',platformNumber:'Номери бортів',starlinkNumber:'Номери Starlink'};
+    let equipmentRows=[];
+    let equipmentReady=false;
+    let equipmentLoading=false;
+    const equipmentStatuses={vp:'На ВП',warehouse:'На складі',repair:'У ремонті',lost:'Втрачено'};
     let boardTerminalLinks=[];
     let boardLinksReady=false;
     let directoryRows=[];
@@ -227,7 +233,7 @@
       localStorage.setItem(KEY,JSON.stringify(flights));
       $('syncError').textContent='';
       render();
-      loadDirectories();loadBoardLinks();
+      loadDirectories();loadBoardLinks();loadEquipment();
     }
     async function loadUserRole(){if(!cloudEnabled||!currentUser)return;currentRole=null;updateCloudUI();const {data,error}=await cloud.from('flight_user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();if(error){$('syncError').textContent='Не вдалося перевірити роль: '+error.message;updateCloudUI();return}currentRole=data?.role||null;updateCloudUI();if(currentRole){await refreshFromCloud();initializeWorldMap();}}
     async function save(record,isEdit){
@@ -340,13 +346,13 @@
     $('editor').addEventListener('cancel',e=>{if(savingRecord)e.preventDefault();});
     $('exportBtn').onclick=async()=>{const button=$('exportBtn');const original=button.textContent;button.disabled=true;button.textContent='Формуємо XLSX…';try{await exportFlightReport(flights);}catch(error){console.error('Не вдалося сформувати XLSX-звіт',error);alert(error.message||'Не вдалося сформувати XLSX-звіт. Спробуйте ще раз.');}finally{button.disabled=false;button.textContent=original;}};
     function updateDirectoryAccess(){
-      $('directoryForm').hidden=cloudEnabled?currentRole!=='admin':false;$('boardLinkForm').hidden=cloudEnabled?currentRole!=='admin':false;
-      if(cloudEnabled&&!currentUser){directoryRows=[];directoryReady=false;boardTerminalLinks=[];boardLinksReady=false;}
+      $('directoryForm').hidden=cloudEnabled?currentRole!=='admin':false;$('boardLinkForm').hidden=cloudEnabled?currentRole!=='admin':false;$('equipmentEditorPanel').hidden=cloudEnabled?currentRole!=='admin':false;
+      if(cloudEnabled&&!currentUser){directoryRows=[];directoryReady=false;boardTerminalLinks=[];boardLinksReady=false;equipmentRows=[];equipmentReady=false;}
     }
     function refreshDirectoryChoices(record){
       Object.keys(directoryFields).forEach(field=>{
         const current=record?String(record[field]||''):$(field).value;
-        const values=[...new Set([...directoryRows.filter(row=>row.category===field).map(row=>row.value),...flights.map(f=>String(f[field]||'')).filter(Boolean),current].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
+        const values=[...new Set([...directoryRows.filter(row=>row.category===field).map(row=>row.value),...flights.map(f=>String(f[field]||'')).filter(Boolean),...(field==='platformNumber'?equipmentRows.map(row=>row.board_number):[]),current].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
         $(field).innerHTML='<option value="">Оберіть зі списку</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');
         $(field).value=current;
       });
@@ -376,6 +382,23 @@
       const count=flights.filter(f=>f.id!==record?.id&&f.platformNumber===board&&f.platformKind===kind).length;
       $('boardCountHint').textContent=automatic?(board?'Борт '+board+': після збереження '+(count+1)+' записів за весь час. Цей рейс = 1 виліт / виїзд.':'Один запис = один виліт / виїзд. Оберіть номер борта.'):'Старий запис: збережено попередню кількість. Підсумок за бортом рахує записи.';
     }
+    function renderEquipment(){
+      $('equipmentSummary').innerHTML=['НРК','Вампір'].map(kind=>{const rows=equipmentRows.filter(r=>r.platform_kind===kind),count=status=>rows.filter(r=>r.status===status).length;return '<div class="stat"><span>'+kind+' · наявні</span><strong>'+rows.filter(r=>r.status!=='lost').length+'</strong><p class="note">На ВП: '+count('vp')+' · Склад: '+count('warehouse')+'<br>Ремонт: '+count('repair')+' · Втрачено: '+count('lost')+'</p></div>';}).join('');
+      const kind=$('equipmentKindFilter').value,status=$('equipmentStatusFilter').value,query=$('equipmentSearch').value.trim().toLowerCase();
+      const rows=equipmentRows.filter(r=>(!kind||r.platform_kind===kind)&&(!status||r.status===status)&&(!query||(r.board_number+' '+(r.model||'')).toLowerCase().includes(query)));
+      $('equipmentList').innerHTML=rows.map(r=>'<div class="day-row"><div><strong>'+esc(r.platform_kind)+' · '+esc(r.board_number)+'</strong><small>'+esc(r.model||'')+' · '+esc(equipmentStatuses[r.status])+'</small>'+(r.notes?'<p class="note">'+esc(r.notes)+'</p>':'')+'</div>'+(currentRole==='admin'?'<button class="btn" type="button" data-equipment-edit="'+esc(r.id)+'">Змінити</button>':'')+'</div>').join('')||'<p class="note">Техніку не знайдено. Для обліку кожен борт потрібно додати окремо.</p>';
+    }
+    async function loadEquipment(){
+      if(equipmentLoading||!cloudEnabled||!currentUser||!currentRole)return;equipmentLoading=true;const uid=currentUser.id;
+      try{const {data,error}=await cloud.from('flight_equipment').select('id,platform_kind,board_number,model,status,notes,updated_at');if(currentUser?.id!==uid)return;if(error)throw error;equipmentRows=data||[];equipmentReady=true;$('equipmentNotice').textContent='Дані техніки завантажено. Статуси змінюються окремо від журналу рейсів.';renderEquipment();refreshDirectoryChoices();}
+      catch(error){equipmentReady=false;$('equipmentNotice').textContent='Облік техніки недоступний. Виконайте supabase-equipment.sql у SQL Editor. Поточні рейси залишаються доступними.';}finally{equipmentLoading=false;}
+    }
+    function newEquipment(){if($('equipmentSave').disabled)return;$('equipmentForm').reset();$('equipmentId').value='';$('equipmentKind').disabled=false;$('equipmentNumber').readOnly=false;$('equipmentFormTitle').textContent='Додати техніку';$('equipmentSaveStatus').textContent='';}
+    $('equipmentNew').onclick=newEquipment;
+    $('equipmentKindFilter').onchange=$('equipmentStatusFilter').onchange=$('equipmentSearch').oninput=renderEquipment;
+    $('equipmentList').onclick=event=>{const button=event.target.closest('[data-equipment-edit]');if(!button||currentRole!=='admin'||$('equipmentSave').disabled)return;const row=equipmentRows.find(r=>r.id===button.dataset.equipmentEdit);if(!row)return;$('equipmentId').value=row.id;$('equipmentKind').value=row.platform_kind;$('equipmentKind').disabled=true;$('equipmentNumber').value=row.board_number;$('equipmentNumber').readOnly=true;$('equipmentModel').value=row.model||'';$('equipmentStatus').value=row.status;$('equipmentNotes').value=row.notes||'';$('equipmentFormTitle').textContent='Змінити стан борта '+row.board_number;$('equipmentSaveStatus').textContent='';$('equipmentStatus').focus();};
+    $('equipmentForm').onsubmit=async event=>{event.preventDefault();if(currentRole!=='admin'||!cloudEnabled||$('equipmentSave').disabled)return;if(!equipmentReady){await loadEquipment();if(!equipmentReady)return;}const id=$('equipmentId').value,number=$('equipmentNumber').value.trim();if(!number)return;const row={platform_kind:$('equipmentKind').value,board_number:number,model:$('equipmentModel').value.trim(),status:$('equipmentStatus').value,notes:$('equipmentNotes').value.trim(),updated_at:new Date().toISOString(),updated_by:currentUser.id};$('equipmentSave').disabled=true;$('equipmentSaveStatus').textContent='Зберігаємо…';try{const query=id?cloud.from('flight_equipment').update(row).eq('id',id):cloud.from('flight_equipment').insert({...row,id:crypto.randomUUID()});const {data,error}=await query.select('id').single();if(error)throw error;if(!data)throw Error('Збереження не підтверджено');await loadEquipment();$('equipmentSaveStatus').textContent='Стан техніки збережено.';}catch(error){$('equipmentSaveStatus').textContent=error.code==='23505'?'Такий номер для цієї платформи вже є. Змініть його стан у списку.':'Не вдалося зберегти: '+error.message;}finally{$('equipmentSave').disabled=false;}};
+    renderEquipment();
     function applyBoardTerminal(){
       const link=boardTerminalLinks.find(row=>row.platform_kind===$('platformKind').value&&row.board_number===$('platformNumber').value);
       $('starlinkNumber').value='';
