@@ -1,7 +1,7 @@
 -- Separate equipment registry. Existing flight records and users are not modified.
 create table if not exists public.flight_equipment (
  id uuid primary key default gen_random_uuid(),
- platform_kind text not null check (platform_kind in ('НРК','Вампір')),
+ platform_kind text not null check (platform_kind in ('НРК','Вампір','HEAVY SHOT')),
  board_number text not null check (length(trim(board_number)) between 1 and 120),
  model text not null default '',
  status text not null check (status in ('vp','warehouse','repair','lost')),

@@ -1,6 +1,6 @@
 -- Separate shared mapping. Does not modify users, directories or flight records.
 create table if not exists public.flight_board_terminals (
-  platform_kind text not null check (platform_kind in ('НРК','Вампір')),
+  platform_kind text not null check (platform_kind in ('НРК','Вампір','HEAVY SHOT')),
   board_number text not null check (length(trim(board_number)) between 1 and 120),
   starlink_number text not null check (length(trim(starlink_number)) between 1 and 120),
   primary key (platform_kind, board_number)

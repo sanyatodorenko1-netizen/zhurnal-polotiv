@@ -18,6 +18,7 @@
     const platform = text(record.platformKind).toLocaleLowerCase('uk-UA');
     const task = text(record.task).toLocaleLowerCase('uk-UA');
     const aircraft = text(record.aircraft).toLocaleLowerCase('uk-UA');
+    if (platform==='heavy shot' || /heavy[ -]?shot/i.test(aircraft)) return 'HEAVY SHOT';
     if (platform.includes('vamp') || platform.includes('вамп') || task.includes('вамп') || aircraft.includes('vamp') || aircraft.includes('вамп')) return 'VAMPIRE';
     if (platform === 'нрк' || task.includes('місія нрк')) return 'НРК';
     return '';
@@ -101,7 +102,7 @@
     sheet.getCell('A2').font = { name: 'Aptos', size: 10, italic: true, color: { argb: 'FF526158' } };
     sheet.getRow(2).height = 24;
     sheet.mergeCells(3, 1, 3, columnCount);
-    sheet.getCell('A3').value = 'У звіті лише НРК і VAMPIRE. Порожні та відсутні значення не замінено нулями.';
+    sheet.getCell('A3').value = 'У звіті лише НРК, VAMPIRE і HEAVY SHOT. Порожні та відсутні значення не замінено нулями.';
     sheet.getCell('A3').font = { name: 'Aptos', size: 9, color: { argb: 'FF526158' } };
     sheet.getCell('A3').alignment = { wrapText: true, vertical: 'middle' };
     sheet.getRow(3).height = 28;
@@ -188,16 +189,16 @@
     const notesRow = addDetails(sheet, detailHeaders, details, row);
     const missing = [];
     if (successful.known < successful.total || failed.known < failed.total) missing.push('У старих записах кількість успішних і неуспішних місій не збережена. Заповніть нові поля під час додавання або редагування запису, якщо дані відомі.');
-    if (uncategorized) missing.push(`${uncategorized} записів без визначеної платформи не включено до аркушів НРК і VAMPIRE.`);
+    if (uncategorized) missing.push(`${uncategorized} записів без визначеної платформи не включено до аркушів НРК, VAMPIRE і HEAVY SHOT.`);
     addUnavailable(sheet, missing, notesRow, detailHeaders.length);
     [12, 13, 18, 20, 20, 22, 22, 14, 15, 17, 18, 15, 14, 18, 17, 22, 12, 36].forEach((width, index) => { sheet.getColumn(index + 1).width = width; });
     return sheet;
   }
 
-  function buildVampireSheet(workbook, records, period, uncategorized) {
-    const sheet = workbook.addWorksheet('VAMPIRE');
+  function buildVampireSheet(workbook, records, period, uncategorized, title = 'VAMPIRE') {
+    const sheet = workbook.addWorksheet(title);
     const detailHeaders = ['Час', 'Дата', 'Тип завдання', 'Тип / модель', 'Номер борта', 'Позиція / відправлення', 'Пункт доставки', 'Вильотів', 'Бортів у записі', 'Тип вантажу', 'Доставлено посилок', 'Маса вантажу, кг', 'Доставлено', 'Тип БК', 'Підвішено бомб, шт.', 'Витрачено БК, шт.', 'Не розірвалося, шт.', 'Вага БК, кг', 'Уражено цілей', 'Позначки результату', 'Втрачено бортів', 'Виконавець', 'Примітки'];
-    prepareSheet(sheet, 'VAMPIRE', period, detailHeaders.length);
+    prepareSheet(sheet, title, period, detailHeaders.length);
     const deliveries = records.filter(record => text(record.task).toLocaleLowerCase('uk-UA') === 'доставка');
     const deliveredEntries = deliveries.filter(record => statusText(record.cargoDelivered) === 'Так');
     const deliveredWeight = knownSum(deliveredEntries, 'weight');
@@ -242,7 +243,7 @@
     if (packages.known < packages.total) missing.push('У старих записах кількість посилок не збережена. Заповніть нове поле в записах доставки, якщо дані відомі.');
     if (bombsUsed.known < bombsUsed.total || bombsFailed.known < bombsFailed.total) missing.push('У старих записах фактична витрата БК та кількість боєприпасів, що не розірвалися, не збережені. Заповніть нові поля в записах бомбардування, якщо дані відомі.');
     if (targets.known < targets.total) missing.push('У старих записах кількість уражених цілей не збережена. Заповніть нове поле в записах бомбардування, якщо дані відомі.');
-    if (uncategorized) missing.push(`${uncategorized} записів без визначеної платформи не включено до аркушів НРК і VAMPIRE.`);
+    if (uncategorized) missing.push(`${uncategorized} записів без визначеної платформи не включено до аркушів НРК, VAMPIRE і HEAVY SHOT.`);
     addUnavailable(sheet, missing, notesRow, detailHeaders.length);
     [12, 13, 18, 20, 17, 18, 20, 14, 16, 18, 18, 15, 14, 18, 17, 17, 17, 15, 16, 28, 15, 22, 36].forEach((width, index) => { sheet.getColumn(index + 1).width = width; });
     return sheet;
@@ -250,7 +251,7 @@
 
   function createWorkbook(ExcelJS, flights) {
     const records = Array.isArray(flights) ? flights : [];
-    const platformRecords = { 'НРК': [], VAMPIRE: [] };
+    const platformRecords = { 'НРК': [], VAMPIRE: [], 'HEAVY SHOT': [] };
     let uncategorized = 0;
     records.forEach(record => {
       const platform = classify(record);
@@ -266,6 +267,7 @@
     workbook.created = new Date();
     buildNrkSheet(workbook, platformRecords['НРК'], period, uncategorized);
     buildVampireSheet(workbook, platformRecords.VAMPIRE, period, uncategorized);
+    buildVampireSheet(workbook, platformRecords['HEAVY SHOT'], period, uncategorized, 'HEAVY SHOT');
     return workbook;
   }
 
