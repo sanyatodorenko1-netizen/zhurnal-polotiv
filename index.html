@@ -29,7 +29,7 @@
     body.auth-gate{min-height:100vh;background:radial-gradient(ellipse at 18% 18%,#294638 0,transparent 42%),radial-gradient(ellipse at 88% 86%,#26362c 0,transparent 38%),#0b100e;background-attachment:fixed}body.auth-gate .app-frame{display:block;min-height:100vh}body.auth-gate .sidebar,body.auth-gate .shell>.top{display:none}body.auth-gate .shell{min-height:100vh;display:grid;place-items:center;padding:36px 22px}body.auth-gate .sync-box{width:min(1040px,100%);margin:0;padding:0;border:0;background:transparent;box-shadow:none}body.auth-gate .welcome-layout{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(340px,.9fr);gap:clamp(26px,6vw,76px);align-items:center}.welcome-copy{padding:clamp(8px,3vw,32px)}.welcome-brand{display:flex;align-items:center;gap:12px;margin-bottom:38px}.welcome-brand .brand-mark{width:46px;height:46px}.welcome-brand strong,.welcome-brand small{display:block}.welcome-brand small{margin-top:2px;color:var(--muted);font-size:10px;letter-spacing:.14em;text-transform:uppercase}.welcome-eyebrow{color:var(--accent);font-size:11px;font-weight:750;letter-spacing:.17em;text-transform:uppercase}.welcome-copy h1{max-width:560px;margin:12px 0;font-size:clamp(34px,5vw,58px);line-height:1.04;letter-spacing:-.045em}.welcome-copy>p{max-width:470px;color:#c0cbc3;font-size:16px;line-height:1.7}.welcome-features{display:grid;gap:12px;margin-top:28px;color:#c0cbc3;font-size:13px}.welcome-features span{display:flex;gap:10px;align-items:center}.welcome-features b{display:grid;width:24px;height:24px;place-items:center;border-radius:8px;background:#c7f36b18;color:var(--accent)}.welcome-card{padding:clamp(22px,3vw,34px);border:1px solid #ffffff20;border-radius:20px;background:linear-gradient(150deg,#1b2621f2,#111916f5);box-shadow:0 24px 90px #0005;backdrop-filter:blur(18px)}.welcome-card h2{margin:0;font-size:23px;letter-spacing:-.02em}.welcome-card>p{margin:7px 0 22px;color:var(--muted);font-size:13px}.welcome-card form[hidden],.welcome-card #setupMessage[hidden]{display:none}.welcome-card .sync-row{display:grid;gap:13px}.welcome-card .sync-row>div{min-width:0}.welcome-card label{margin-bottom:7px}.welcome-card input{min-height:46px;background:#0e1512}.welcome-card .sync-row .btn{height:auto;min-height:46px}.welcome-card .sync-row button{width:100%}.welcome-card .sync-row button+button{margin-top:-5px}.welcome-card #syncError{margin-top:12px;min-height:20px}.welcome-card #setupMessage{padding:16px;border:1px dashed var(--line);border-radius:12px}.welcome-card #setupMessage h2{font-size:18px}.welcome-card #setupMessage p{margin-bottom:0;color:var(--muted);font-size:13px}.welcome-foot{margin:18px 0 0;color:#84948a;font-size:11px;text-align:center}
     @media(max-width:760px){body.auth-gate .shell{padding:24px 16px}body.auth-gate .welcome-layout{grid-template-columns:1fr;gap:16px;max-width:520px}.welcome-copy{padding:0 4px}.welcome-brand{margin-bottom:24px}.welcome-copy h1{font-size:38px}.welcome-copy>p{font-size:14px}.welcome-features{grid-template-columns:1fr 1fr;margin-top:18px}.welcome-card{padding:22px}}
     @media(max-width:420px){body.auth-gate .shell{padding:18px 12px}.welcome-copy h1{font-size:32px}.welcome-features{grid-template-columns:1fr}.welcome-card{padding:18px}}
-    body.auth-gate .welcome-copy{position:relative;isolation:isolate;overflow:hidden;min-height:600px;border:1px solid #ffffff20;border-radius:22px;padding:clamp(24px,3vw,34px);background-color:#101714;background-image:linear-gradient(180deg,rgba(9,15,12,.05) 0%,rgba(9,15,12,.18) 28%,rgba(9,15,12,.88) 62%,#0b100e 100%),url("./welcome-agri.jpg");background-position:center,top center;background-size:100% 100%,100% auto;background-repeat:no-repeat;box-shadow:0 24px 90px #0005}body.auth-gate .welcome-brand{margin-bottom:auto;padding-bottom:160px}body.auth-gate .welcome-copy h1{max-width:520px;font-size:clamp(32px,4.3vw,50px)}
+    body.auth-gate .welcome-copy{position:relative;isolation:isolate;overflow:hidden;min-height:600px;border:1px solid #ffffff20;border-radius:22px;padding:clamp(24px,3vw,34px);background-color:#101714;background-image:linear-gradient(180deg,rgba(9,15,12,.05) 0%,rgba(9,15,12,.18) 28%,rgba(9,15,12,.88) 62%,#0b100e 100%),url("./spartan-background.jpg");background-position:center,top center;background-size:100% 100%,100% auto;background-repeat:no-repeat;box-shadow:0 24px 90px #0005}body.auth-gate .welcome-brand{margin-bottom:auto;padding-bottom:160px}body.auth-gate .welcome-copy h1{max-width:520px;font-size:clamp(32px,4.3vw,50px)}
     @media(max-width:760px){body.auth-gate .welcome-copy{min-height:540px;background-size:100% 100%,100% auto}body.auth-gate .welcome-brand{padding-bottom:120px}}
     @media(max-width:420px){body.auth-gate .welcome-copy{min-height:490px;padding:18px}body.auth-gate .welcome-brand{padding-bottom:90px}}
   </style>
@@ -57,8 +57,8 @@
       <div class="welcome-layout">
         <div class="welcome-copy"><div class="welcome-brand"><div class="brand-mark" aria-hidden="true">Ж</div><div><strong>Журнал польотів</strong><small>Спільний робочий простір</small></div></div><div class="welcome-eyebrow">Єдиний журнал команди</div><h1>Вітаємо у спільному журналі</h1><p>Увійдіть, щоб переглядати записи, статистику та робочі точки, синхронізовані для вашої команди.</p><div class="welcome-features"><span><b>✓</b> Спільні записи</span><span><b>✓</b> Статистика команди</span><span><b>✓</b> Доступ за ролями</span></div></div>
         <div class="welcome-card">
-          <div id="setupMessage"><h2>Налаштування бази</h2><p>Щоб увімкнути спільний доступ, адміністратор має налаштувати підключення Supabase.</p></div>
-          <form id="loginForm" hidden><h2>Вхід до журналу</h2><p>Введіть дані облікового запису.</p><div class="sync-row"><div><label for="loginEmail">Електронна пошта</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div><div><label for="loginPassword">Пароль</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Ваш пароль" required></div><button class="btn primary" type="submit">Увійти до журналу</button><button class="btn" type="button" id="forgotPasswordBtn">Забули пароль?</button></div></form>
+          <div id="setupMessage" hidden><h2>Налаштування бази</h2><p>Щоб увімкнути спільний доступ, адміністратор має налаштувати підключення Supabase.</p></div>
+          <form id="loginForm"><h2>Вхід до журналу</h2><p>Введіть дані облікового запису.</p><div class="sync-row"><div><label for="loginEmail">Електронна пошта</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div><div><label for="loginPassword">Пароль</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Ваш пароль" required></div><button class="btn primary" type="submit">Увійти до журналу</button><button class="btn" type="button" id="forgotPasswordBtn">Забули пароль?</button></div></form>
           <form id="resetRequestForm" hidden><h2>Відновлення пароля</h2><p>Вкажіть email акаунта — надішлемо лист із посиланням для створення нового пароля.</p><div class="sync-row"><div><label for="resetEmail">Електронна пошта</label><input id="resetEmail" type="email" autocomplete="email" required></div><button class="btn primary" type="submit">Надіслати лист</button><button class="btn" type="button" id="backToLoginBtn">Назад до входу</button></div></form>
           <form id="newPasswordForm" hidden><h2>Новий пароль</h2><p>Задайте новий пароль для свого облікового запису.</p><div class="sync-row"><div><label for="newPassword">Новий пароль</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></div><button class="btn primary" type="submit">Зберегти пароль</button></div></form>
           <div class="sync-error" id="syncError" role="status"></div><p class="welcome-foot">Облікові записи створює адміністратор журналу.</p>
@@ -170,7 +170,7 @@
   <script src="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
- <script src="flight-report-export.js"></script>
+  <script src="flight-report-export.js"></script>
   <script>
     const KEY='flight-log-v1';
     const CALLSIGNS_KEY='flight-log-callsigns-v1';
@@ -213,7 +213,6 @@
     const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const formatDate=s=>s?new Date(s+'T00:00:00').toLocaleDateString('uk-UA',{day:'2-digit',month:'short',year:'numeric'}):'—';
     
-    // Call signs management per platform
     function getStoredCallsigns(){
       try { return JSON.parse(localStorage.getItem(CALLSIGNS_KEY)||'{}'); } catch { return {}; }
     }
@@ -243,13 +242,30 @@
       if(!cloudEnabled){
         $('setupMessage').hidden=false;$('loginForm').hidden=true;$('resetRequestForm').hidden=true;$('newPasswordForm').hidden=true;$('signedInBox').hidden=true;$('roleManager').hidden=true;$('appContent').hidden=false;$('syncPanel').hidden=false;$('addBtn').hidden=false;$('emptyAddBtn').hidden=false;$('addWorkPointBtn').hidden=false;document.querySelector('[data-view="roles"]').hidden=true;$('syncError').textContent='';initializeWorldMap();return;
       }
-      $('setupMessage').hidden=true;const changingPassword=!!currentUser&&passwordRecovery;$('loginForm').hidden=!!currentUser||$('resetRequestForm').dataset.active==='true';$('resetRequestForm').hidden=!!currentUser||$('resetRequestForm').dataset.active!=='true';$('newPasswordForm').hidden=!changingPassword;$('signedInBox').hidden=!currentUser||changingPassword;$('appContent').hidden=!currentUser||changingPassword;$('syncPanel').hidden=!!currentUser&&!changingPassword&&!$('syncError').textContent;$('roleManager').hidden=currentRole!=='admin';document.querySelector('[data-view="roles"]').hidden=currentRole!=='admin';if(currentRole!=='admin'&&activeView==='roles')showView('overview');
+      $('setupMessage').hidden=true;
+      const changingPassword=!!currentUser&&passwordRecovery;
+      $('loginForm').hidden=!!currentUser||$('resetRequestForm').dataset.active==='true';
+      $('resetRequestForm').hidden=!!currentUser||$('resetRequestForm').dataset.active!=='true';
+      $('newPasswordForm').hidden=!changingPassword;
+      $('signedInBox').hidden=!currentUser||changingPassword;
+      $('appContent').hidden=!currentUser||changingPassword;
+      $('syncPanel').hidden=!!currentUser&&!changingPassword&&!$('syncError').textContent;
+      $('roleManager').hidden=currentRole!=='admin';
+      document.querySelector('[data-view="roles"]').hidden=currentRole!=='admin';
+      if(currentRole!=='admin'&&activeView==='roles')showView('overview');
       
-      // Admin, Moderator, Executor can add and edit
       const canManageRecords=['admin','executor','moderator'].includes(currentRole);
-      $('addBtn').hidden=!canManageRecords;$('emptyAddBtn').hidden=!canManageRecords;$('addWorkPointBtn').hidden=!canManageRecords;
+      $('addBtn').hidden=!canManageRecords;
+      $('emptyAddBtn').hidden=!canManageRecords;
+      $('addWorkPointBtn').hidden=!canManageRecords;
       
-      if(currentUser&&!changingPassword){$('signedInEmail').textContent=currentUser.email||'Обліковий запис';$('roleLabel').textContent=roleNames[currentRole]||'Роль не призначена';$('syncState').textContent=currentRole?'Підключено до спільної бази':'Очікується призначення ролі';if(currentRole&&/^Доступ до даних очікує|^Зверніться до адміна/.test($('syncError').textContent))$('syncError').textContent='';if(!currentRole&&!$('syncError').textContent)$('syncError').textContent='Доступ до даних очікує на призначення ролі адміністратором.';}
+      if(currentUser&&!changingPassword){
+        $('signedInEmail').textContent=currentUser.email||'Обліковий запис';
+        $('roleLabel').textContent=roleNames[currentRole]||'Роль не призначена';
+        $('syncState').textContent=currentRole?'Підключено до спільної бази':'Очікується призначення ролі';
+        if(currentRole&&/^Доступ до даних очікує|^Зверніться до адміна/.test($('syncError').textContent))$('syncError').textContent='';
+        if(!currentRole&&!$('syncError').textContent)$('syncError').textContent='Доступ до даних очікує на призначення ролі адміністратором.';
+      }
     }
     const syncPanelObserver=new MutationObserver(()=>{if(cloudEnabled&&currentUser&&!passwordRecovery)$('syncPanel').hidden=!$('syncError').textContent;});syncPanelObserver.observe($('syncError'),{childList:true,subtree:true,characterData:true});
     
@@ -267,8 +283,6 @@
         const title=esc(f.destination||f.position||'Місце виконання роботи');
         const details=[formatDate(f.date),f.task,f.executor].filter(Boolean).map(esc);
         const popup=`<strong>${title}</strong><br>${details.join(' · ')}${f.weight?`<br>Вантаж: ${esc(f.weight)} кг`:''}`;
-        
-        // Custom marker color based on platform or task
         const markerColor = f.platformKind==='Вампір' ? '#ff9a8e' : '#c7f36b';
         const marker=new maplibregl.Marker({color:markerColor}).setLngLat([point[1],point[0]]).setPopup(new maplibregl.Popup({offset:24}).setHTML(popup)).addTo(agroMap);
         savedWorkMarkers.push(marker);
@@ -309,13 +323,35 @@
     $('backToLoginBtn').onclick=()=>{$('resetRequestForm').dataset.active='false';$('syncError').textContent='';updateCloudUI();};$('resetRequestForm').onsubmit=async e=>{e.preventDefault();$('syncError').textContent='';const {error}=await cloud.auth.resetPasswordForEmail($('resetEmail').value,{redirectTo:location.origin+location.pathname});if(error){$('syncError').textContent='Не вдалося надіслати лист: '+error.message;return}$('syncError').textContent='Якщо для цієї адреси є обліковий запис, лист для відновлення надіслано. Перевірте вхідні та папку «Спам».';};
     $('newPasswordForm').onsubmit=async e=>{e.preventDefault();$('syncError').textContent='';const {error}=await cloud.auth.updateUser({password:$('newPassword').value});if(error){$('syncError').textContent='Не вдалося зберегти пароль: '+error.message;return}passwordRecovery=false;$('newPassword').value='';$('syncError').textContent='Пароль змінено. Тепер увійдіть із новим паролем.';await cloud.auth.signOut();};
     $('signOutBtn').onclick=()=>cloud.auth.signOut();$('roleForm').onsubmit=async e=>{e.preventDefault();$('roleMessage').textContent='';const target=$('roleEmail').value.trim();const {error}=await cloud.rpc('set_flight_user_role',{target_email:target,new_role:$('roleSelect').value});if(error){$('roleMessage').textContent='Не вдалося призначити роль: '+error.message;return}$('roleMessage').textContent='Роль збережено.';$('roleForm').reset();if(target.toLowerCase()===currentUser?.email?.toLowerCase())await loadUserRole();};
-    if(cloudEnabled){cloud.auth.onAuthStateChange((event,session)=>{if(event==='PASSWORD_RECOVERY')passwordRecovery=true;if(event==='SIGNED_OUT'){passwordRecovery=false;currentRole=null;}currentUser=session?.user||null;if(currentUser&&!passwordRecovery){updateCloudUI();setTimeout(()=>loadUserRole(),0);}else{updateCloudUI();if(!currentUser){flights=JSON.parse(localStorage.getItem(KEY)||'[]');render();}}});cloud.auth.getSession().then(({data})=>{currentUser=data.session?.user||null;if(currentUser&&!passwordRecovery)loadUserRole();else updateCloudUI();});setInterval(refreshFromCloud,10000);}else updateCloudUI();
+    
+    if(cloudEnabled){
+      cloud.auth.onAuthStateChange((event,session)=>{
+        if(event==='PASSWORD_RECOVERY')passwordRecovery=true;
+        if(event==='SIGNED_OUT'){passwordRecovery=false;currentRole=null;}
+        currentUser=session?.user||null;
+        if(currentUser&&!passwordRecovery){
+          updateCloudUI();
+          setTimeout(()=>loadUserRole(),0);
+        }else{
+          updateCloudUI();
+          if(!currentUser){
+            flights=JSON.parse(localStorage.getItem(KEY)||'[]');
+            render();
+          }
+        }
+      });
+      cloud.auth.getSession().then(({data})=>{
+        currentUser=data.session?.user||null;
+        if(currentUser&&!passwordRecovery)loadUserRole();
+        else updateCloudUI();
+      });
+      setInterval(refreshFromCloud,10000);
+    }else updateCloudUI();
     
     function render(){
       const month=$('monthFilter').value, task=$('taskFilter').value;
       const filtered=flights.filter(f=>(!month||f.date.startsWith(month))&&(!task||f.task===task)).sort((a,b)=>b.date.localeCompare(a.date));
       
-      // Updated statistics logic with decimal handling
       $('totalStat').textContent=flights.length;
       $('periodStat').textContent=filtered.length;
       $('weightStat').textContent=filtered.reduce((n,f)=>n+(parseFloat(f.weight)||0),0).toLocaleString('uk-UA',{maximumFractionDigits:1})+' кг';
@@ -336,7 +372,6 @@
         const payload=isBombing?`<div class="subline">БК: ${esc(f.bombType||'—')} · ${parseInt(f.bombCount)||0} шт. · ${(parseFloat(f.bombWeight)||0).toLocaleString('uk-UA')} кг</div>`:`${esc(f.cargoType||'—')}<div class="subline">Вантаж: ${(parseFloat(f.weight)||0).toLocaleString('uk-UA')} кг</div>${isMission?`<div class="subline">План: ${(parseFloat(f.plannedWeight)||0).toLocaleString('uk-UA')} кг</div>`:''}`;
         const route=isBombing?`Ціль: ${esc(f.bombCoordinates||'—')}`:`${esc(f.position||'—')} → ${esc(f.destination||'—')}<div class="subline">${esc(f.coordinates||'')}</div>`;
         
-        // Allowed to edit for admin, moderator, executor
         const canEdit=!cloudEnabled||['admin','moderator','executor'].includes(currentRole);
         const canDelete=!cloudEnabled||currentRole==='admin';
         const actions=(canEdit?`<button class="icon-btn" data-edit="${f.id}" title="Змінити">✎</button>`:'')+(canDelete?`<button class="icon-btn" data-delete="${f.id}" title="Видалити">⌫</button>`:'');
@@ -383,7 +418,6 @@
       const id=$('recordId').value;
       const previous=id?flights.find(x=>x.id===id):null;
       
-      // Check permissions for add/edit (admin, moderator, executor)
       const canManageRecords=['admin','executor','moderator'].includes(currentRole);
       if(cloudEnabled&&!canManageRecords){
         $('syncError').textContent='У вашої ролі немає права на цю дію.';
@@ -404,7 +438,6 @@
       f.id=recordId;
       f.created_by=previous?.created_by||currentUser?.id||null;
       
-      // Save executor callsign for current platform
       if(f.executor){
         saveCallsign(f.platformKind, f.executor);
       }
