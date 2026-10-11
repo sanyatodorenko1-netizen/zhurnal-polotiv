@@ -121,6 +121,18 @@
   </main>
   </div>
   <dialog id="recordViewer"><div class="form-head"><h2>Подробиці рейсу</h2><button type="button" class="icon-btn" id="closeViewer" aria-label="Закрити подробиці">✕</button></div><div class="form-body" id="recordDetails"></div><div class="form-foot"><button type="button" class="btn primary" id="repeatViewed">Повторити рейс</button></div></dialog>
+  <dialog id="equipmentSpecsDialog" aria-labelledby="equipmentSpecsTitle">
+    <div class="form-head"><h2 id="equipmentSpecsTitle">ТТХ</h2><button type="button" class="icon-btn" id="closeEquipmentSpecs" aria-label="Закрити характеристики">✕</button></div>
+    <div class="form-body">
+      <div id="equipmentSpecsPicker" class="equipment-specs-picker" hidden><label for="equipmentSpecsModel">Модель НРК</label><select id="equipmentSpecsModel"></select></div>
+      <h3 id="equipmentSpecsModelTitle" class="equipment-specs-model" aria-live="polite"></h3>
+      <p id="equipmentSpecsDescription" class="note equipment-specs-description"></p>
+      <dl id="equipmentSpecsFacts" class="detail-grid"></dl>
+      <p id="equipmentSpecsNote" class="note"></p>
+      <div class="equipment-specs-sources"><h3>Джерела</h3><ul id="equipmentSpecsSources"></ul><p class="note">Перевірено 11.10.2026</p></div>
+    </div>
+    <div class="form-foot"><button type="button" class="btn" id="equipmentSpecsDone">Закрити</button></div>
+  </dialog>
   <dialog id="editor"><form id="flightForm">
     <div class="form-head"><h2 id="formTitle">Новий рейс</h2><button type="button" class="icon-btn" id="closeBtn" aria-label="Закрити">✕</button></div>
     <div class="form-body"><input type="hidden" id="recordId"><div class="form-grid">
@@ -173,6 +185,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
   <script src="assets/flight-report-export.js"></script>
+  <script src="assets/equipment-specs.js"></script>
   <script>
     const evacuationRates={'5-6':70,'4-5':80,'3-4':90,'2-3':100,'1-2':110,'0-1':120};
     const isAirPlatform=kind=>['Вампір','HEAVY SHOT'].includes(kind);
@@ -392,11 +405,18 @@
         'Вампір':{src:'assets/equipment/vampire-photo.png',alt:'Фото Вампір',width:982,height:637},
         'HEAVY SHOT':{src:'assets/equipment/heavy-shot-field.webp',alt:'Фото HEAVY SHOT',width:1716,height:916}
       };
-      const summary=['НРК','Вампір','HEAVY SHOT'].map(kind=>{const rows=equipmentRows.filter(r=>r.platform_kind===kind),count=status=>rows.filter(r=>r.status===status).length,image=images[kind];return '<div class="stat equipment-stat"><img class="equipment-illustration" src="'+image.src+'" alt="'+esc(image.alt)+'" width="'+image.width+'" height="'+image.height+'" loading="lazy" decoding="async"><div class="equipment-card-content"><span>'+esc(kind)+' · наявні</span><strong>'+rows.filter(r=>r.status!=='lost').length+'</strong><p class="note">На ВП: '+count('vp')+' · Склад: '+count('warehouse')+'<br>Ремонт: '+count('repair')+' · Втрачено: '+count('lost')+'</p></div></div>';}).join('');
+      const summary=['НРК','Вампір','HEAVY SHOT'].map(kind=>{const rows=equipmentRows.filter(r=>r.platform_kind===kind),count=status=>rows.filter(r=>r.status===status).length,image=images[kind];return '<div class="stat equipment-stat"><img class="equipment-illustration" src="'+image.src+'" alt="'+esc(image.alt)+'" width="'+image.width+'" height="'+image.height+'" loading="lazy" decoding="async"><div class="equipment-card-content"><span>'+esc(kind)+' · наявні</span><strong>'+rows.filter(r=>r.status!=='lost').length+'</strong><p class="note">На ВП: '+count('vp')+' · Склад: '+count('warehouse')+'<br>Ремонт: '+count('repair')+' · Втрачено: '+count('lost')+'</p><button type="button" class="btn equipment-specs-button" data-equipment-spec="'+esc(kind)+'" aria-label="Переглянути ТТХ '+esc(kind)+'">ТТХ · Характеристики</button></div></div>';}).join('');
       const availabilityNotice=equipmentReady?'Спільні дані техніки. Оновлюються автоматично кожні 10 секунд.':cloudEnabled&&currentUser&&currentRole?'Дані техніки ще не завантажено.':'Увійдіть з призначеною роллю, щоб переглядати спільну техніку.';
       const placeholder='<p class="note">'+availabilityNotice+'</p>';
-      $('equipmentSummary').innerHTML=equipmentReady?summary:placeholder;
-      $('overviewEquipmentSummary').innerHTML=equipmentReady?summary:placeholder;
+      const summaryMarkup=equipmentReady?summary:placeholder;
+      const focusedElement=globalThis.document?.activeElement,focusedSummary=focusedElement?.closest?.('#equipmentSummary, #overviewEquipmentSummary');
+      let replacedFocusedSummary=false;
+      for(const id of ['equipmentSummary','overviewEquipmentSummary']){
+        if($(id).innerHTML===summaryMarkup)continue;
+        $(id).innerHTML=summaryMarkup;
+        if(focusedSummary?.id===id)replacedFocusedSummary=true;
+      }
+      if(replacedFocusedSummary&&Object.prototype.hasOwnProperty.call(images,focusedElement.dataset.equipmentSpec))$(focusedSummary.id).querySelector('[data-equipment-spec="'+focusedElement.dataset.equipmentSpec+'"]')?.focus({preventScroll:true});
       $('overviewEquipmentNotice').textContent=$('equipmentNotice').textContent||availabilityNotice;
       if(!equipmentReady){$('equipmentList').innerHTML=placeholder;return;}
       const kind=$('equipmentKindFilter').value,status=$('equipmentStatusFilter').value,query=$('equipmentSearch').value.trim().toLowerCase();
