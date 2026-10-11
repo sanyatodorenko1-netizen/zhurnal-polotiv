@@ -15,5 +15,6 @@ drop policy if exists "Assigned users read directories" on public.flight_directo
 create policy "Assigned users read directories" on public.flight_directory_items for select to authenticated
   using ((select public.current_flight_role()) in ('admin','moderator','executor','viewer'));
 drop policy if exists "Admins add directories" on public.flight_directory_items;
-create policy "Admins add directories" on public.flight_directory_items for insert to authenticated
-  with check ((select public.current_flight_role()) = 'admin' and created_by = (select auth.uid()));
+drop policy if exists "Contributors add directories" on public.flight_directory_items;
+create policy "Contributors add directories" on public.flight_directory_items for insert to authenticated
+  with check ((select public.current_flight_role()) in ('admin','moderator','executor') and created_by = (select auth.uid()));
