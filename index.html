@@ -112,7 +112,7 @@
       </div>
     </section>
     </section>
-    <section class="page-view" id="directoriesView" hidden><section class="panel"><h2>Довідники для заповнення рейсів</h2><p class="note">Оберіть категорію. Адміністратор додає варіанти, команда вибирає їх у формі рейсу.</p><div class="filters" style="margin-top:16px"><select id="directoryCategory" aria-label="Категорія довідника"></select></div><form id="directoryForm" class="sync-row" hidden style="margin-top:16px"><div><label for="directoryValue">Новий варіант</label><input id="directoryValue" maxlength="120" required placeholder="Введіть назву або номер"></div><button class="btn primary" id="directoryAddBtn" type="submit">Додати</button></form><p id="directoryStatus" class="note" role="status"></p><div id="directoryItems" class="day-list" style="margin-top:16px"></div></section></section>
+    <section class="page-view" id="directoriesView" hidden><section class="panel"><h2>Довідники для заповнення рейсів</h2><p class="note">Оберіть категорію. Адміністратор додає варіанти, команда вибирає їх у формі рейсу.</p><div class="filters" style="margin-top:16px"><select id="directoryCategory" aria-label="Категорія довідника"></select></div><form id="directoryForm" class="sync-row" hidden style="margin-top:16px"><div><label for="directoryValue">Новий варіант</label><input id="directoryValue" maxlength="120" required placeholder="Введіть назву або номер"></div><button class="btn primary" id="directoryAddBtn" type="submit">Додати</button></form><p id="directoryStatus" class="note" role="status"></p><div id="directoryItems" class="day-list" style="margin-top:16px"></div><hr style="border:0;border-top:1px solid var(--line);margin:24px 0"><h2>Борт → Starlink</h2><p class="note">Зв’язки окремі для НРК та «Вампіра». Історичні записи не змінюються.</p><form id="boardLinkForm" class="sync-row" hidden style="margin-top:16px"><div><label for="linkPlatform">Платформа</label><select id="linkPlatform"><option>НРК</option><option>Вампір</option></select></div><div><label for="linkBoard">Номер борта</label><select id="linkBoard" required></select></div><div><label for="linkTerminal">Starlink</label><select id="linkTerminal"><option value="">Без прив’язки</option></select></div><button class="btn primary" id="saveBoardLink" type="submit">Зберегти зв’язок</button></form><p id="boardLinkStatus" class="note" role="status"></p><div id="boardLinkList" class="day-list"></div></section></section>
     <section class="page-view" id="rolesView" hidden><section class="panel" id="roleManager" hidden><h2>Керування ролями</h2><p>Введіть email зареєстрованого користувача та призначте йому роль.</p><form id="roleForm" class="sync-row"><div><label for="roleEmail">Email користувача</label><input id="roleEmail" type="email" required></div><div><label for="roleSelect">Роль</label><select id="roleSelect"><option value="moderator">Модератор</option><option value="executor">Виконавець</option><option value="viewer">Переглядач</option><option value="admin">Адмін</option></select></div><button class="btn primary" type="submit">Зберегти роль</button></form><div id="roleMessage" class="sync-error" role="status"></div></section></section>
     </div>
   </main>
@@ -127,7 +127,7 @@
       <div><label for="task">Тип завдання *</label><select id="task" required><option>Доставка</option><option>Бомбардування</option></select></div>
       <div><label for="aircraft">Тип / модель борта</label><input id="aircraft" placeholder="За потреби: модель або уточнення"></div>
       <div><label for="platformNumber">Номер борта / НРК / «Вампіра»</label><select id="platformNumber"><option value="">Оберіть зі списку</option></select></div>
-      <div><label for="starlinkNumber">Номер термінала Starlink</label><select id="starlinkNumber"><option value="">Оберіть зі списку</option></select></div>
+      <div><label for="starlinkNumber">Номер термінала Starlink</label><select id="starlinkNumber"><option value="">Оберіть зі списку</option></select><p id="terminalHint" class="note" role="status"></p></div>
       <div><label for="executor">Виконавець місії</label><select id="executor"><option value="">Оберіть зі списку</option></select></div>
       <div class="wide"><p id="boardCountHint" class="note" role="status"></p></div><div><label for="ePoints">Є-бали</label><input id="ePoints" type="text" inputmode="decimal" value="0" pattern="[0-9]+([.,][0-9]+)?" placeholder="Наприклад, 1,5 або 2,25" title="Невід’ємне число, наприклад 1,5"></div>
       <div class="wide" id="evacPointsFields" hidden><label><input type="checkbox" id="autoEvacPoints" style="width:auto;min-height:0"> Автоматично розрахувати бали за евакуацію НРК</label><label for="evacDistanceBand">Діапазон відстані за документом</label><select id="evacDistanceBand"><option value="">Оберіть діапазон</option><option value="5-6">від 5 до 6 км — 70 балів</option><option value="4-5">від 4 до 5 км — 80 балів</option><option value="3-4">від 3 до 4 км — 90 балів</option><option value="2-3">від 2 до 3 км — 100 балів</option><option value="1-2">від 1 до 2 км — 110 балів</option><option value="0-1">від 0 до 1 км або з території, контрольованої ворогом — 120 балів</option></select><p id="evacPointsNotice" class="note" role="status"></p></div><div class="wide" id="nrkReportFields" hidden><div class="form-grid">
@@ -181,6 +181,8 @@
     const cloudEnabled=!!(window.supabase&&cfg.url&&cfg.key&&!cfg.url.includes('YOUR_')&&!cfg.key.includes('YOUR_'));
     const cloud=cloudEnabled?window.supabase.createClient(cfg.url,cfg.key):null;
     const directoryFields={executor:'Виконавці',cargoType:'Типи вантажу',destination:'Пункти призначення',position:'Пункти відправлення',platformNumber:'Номери бортів',starlinkNumber:'Номери Starlink'};
+    let boardTerminalLinks=[];
+    let boardLinksReady=false;
     let directoryRows=[];
     let directoryReady=false;
     let directoryLoading=false;
@@ -225,7 +227,7 @@
       localStorage.setItem(KEY,JSON.stringify(flights));
       $('syncError').textContent='';
       render();
-      loadDirectories();
+      loadDirectories();loadBoardLinks();
     }
     async function loadUserRole(){if(!cloudEnabled||!currentUser)return;currentRole=null;updateCloudUI();const {data,error}=await cloud.from('flight_user_roles').select('role').eq('user_id',currentUser.id).maybeSingle();if(error){$('syncError').textContent='Не вдалося перевірити роль: '+error.message;updateCloudUI();return}currentRole=data?.role||null;updateCloudUI();if(currentRole){await refreshFromCloud();initializeWorldMap();}}
     async function save(record,isEdit){
@@ -329,8 +331,8 @@
     function updateTaskFields(){const bombing=$('task').value==='Бомбардування',vampire=$('platformKind').value==='Вампір';$('bombingFields').hidden=!bombing;$('deliveryFields').hidden=bombing;$('nrkReportFields').hidden=vampire;$('vampireReportFields').hidden=!vampire;$('vampirePackagesField').hidden=!vampire||bombing;$('targetsHitField').hidden=!vampire||!bombing;updateEvacPoints();}
     function updateTaskChoices(selected='Доставка',legacy=''){const options=['Доставка'];if($('platformKind').value==='Вампір')options.push('Бомбардування');else options.push('Медична евакуація');if(legacy&&!options.includes(legacy))options.push(legacy);$('task').innerHTML=options.map(v=>`<option>${esc(v)}</option>`).join('');$('task').value=options.includes(selected)?selected:'Доставка';updateTaskFields();}
     function resetForm(){ $('formSaveStatus').textContent='';$('flightForm').reset();$('autoEvacPoints').checked=true;$('evacDistanceBand').value='';$('recordId').value='';$('date').value=new Date().toISOString().slice(0,10);$('platformKind').value='НРК';updateTaskChoices('Доставка');$('weight').value='0';$('ePoints').value='0';$('bombCount').value='0';$('bombWeight').value='0';$('aircraftCount').value='1';$('nrkTrips').value='0';$('plannedWeight').value='0';$('cargoDelivered').value='false';$('returnedToBase').value='false';$('incidents').value='0';$('formTitle').textContent='Новий рейс'; }
-    function openForm(f){resetForm();if(f){$('formTitle').textContent='Змінити рейс';const kind=f.platformKind||(f.task==='Місія «Вампір»'||String(f.aircraft||'').toLowerCase().includes('вамп')?'Вампір':'НРК');$('platformKind').value=kind;const selected=f.task||'Доставка';updateTaskChoices(selected,f.task==='Місія НРК'||f.task==='Місія «Вампір»'?f.task:'');for(const k of ['id','date','startTime','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombsUsed','bombsFailed','targetsHit','vampireFlights','packagesDelivered','nrkSuccessfulMissions','nrkFailedMissions','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])$(k==='id'?'recordId':k).value=f[k]??'';document.querySelectorAll('[name="impactResults"]').forEach(el=>el.checked=(f.impactResults||[]).includes(el.value));} if(f){$('autoEvacPoints').checked=f.ePointsCalculation?.method==='nrk-evacuation';$('evacDistanceBand').value=f.ePointsCalculation?.distanceBand||'';}updateEvacPoints();refreshDirectoryChoices(f);updateAutomaticCount(f);$('editor').showModal()}$('addBtn').onclick=$('emptyAddBtn').onclick=()=>openForm();$('closeBtn').onclick=$('cancelBtn').onclick=()=>$('editor').close();
-    $('monthFilter').onchange=render;$('taskFilter').onchange=render;$('platformKind').onchange=()=>{updateTaskChoices('Доставка');updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));};$('platformNumber').onchange=()=>updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));$('task').onchange=updateTaskFields;
+    function openForm(f){resetForm();if(f){$('formTitle').textContent='Змінити рейс';const kind=f.platformKind||(f.task==='Місія «Вампір»'||String(f.aircraft||'').toLowerCase().includes('вамп')?'Вампір':'НРК');$('platformKind').value=kind;const selected=f.task||'Доставка';updateTaskChoices(selected,f.task==='Місія НРК'||f.task==='Місія «Вампір»'?f.task:'');for(const k of ['id','date','startTime','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombsUsed','bombsFailed','targetsHit','vampireFlights','packagesDelivered','nrkSuccessfulMissions','nrkFailedMissions','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])$(k==='id'?'recordId':k).value=f[k]??'';document.querySelectorAll('[name="impactResults"]').forEach(el=>el.checked=(f.impactResults||[]).includes(el.value));} if(f){$('autoEvacPoints').checked=f.ePointsCalculation?.method==='nrk-evacuation';$('evacDistanceBand').value=f.ePointsCalculation?.distanceBand||'';}updateEvacPoints();refreshDirectoryChoices(f);updateAutomaticCount(f);$('terminalHint').textContent='';$('editor').showModal()}$('addBtn').onclick=$('emptyAddBtn').onclick=()=>openForm();$('closeBtn').onclick=$('cancelBtn').onclick=()=>$('editor').close();
+    $('monthFilter').onchange=render;$('taskFilter').onchange=render;$('platformKind').onchange=()=>{updateTaskChoices('Доставка');updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));applyBoardTerminal();};$('platformNumber').onchange=()=>{updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));applyBoardTerminal();};$('task').onchange=updateTaskFields;
     function showView(name){if(name==='roles'&&currentRole!=='admin')name='overview';activeView=name;document.querySelectorAll('.page-view').forEach(view=>view.hidden=view.id!==name+'View');document.querySelectorAll('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view===name));if(name==='map'){initializeWorldMap();if(agroMap)setTimeout(()=>agroMap.resize(),120);}}
     document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
     showView('overview');
@@ -338,8 +340,8 @@
     $('editor').addEventListener('cancel',e=>{if(savingRecord)e.preventDefault();});
     $('exportBtn').onclick=async()=>{const button=$('exportBtn');const original=button.textContent;button.disabled=true;button.textContent='Формуємо XLSX…';try{await exportFlightReport(flights);}catch(error){console.error('Не вдалося сформувати XLSX-звіт',error);alert(error.message||'Не вдалося сформувати XLSX-звіт. Спробуйте ще раз.');}finally{button.disabled=false;button.textContent=original;}};
     function updateDirectoryAccess(){
-      $('directoryForm').hidden=cloudEnabled?currentRole!=='admin':false;
-      if(cloudEnabled&&!currentUser){directoryRows=[];directoryReady=false;}
+      $('directoryForm').hidden=cloudEnabled?currentRole!=='admin':false;$('boardLinkForm').hidden=cloudEnabled?currentRole!=='admin':false;
+      if(cloudEnabled&&!currentUser){directoryRows=[];directoryReady=false;boardTerminalLinks=[];boardLinksReady=false;}
     }
     function refreshDirectoryChoices(record){
       Object.keys(directoryFields).forEach(field=>{
@@ -353,7 +355,7 @@
       const category=$('directoryCategory').value;
       const rows=directoryRows.filter(row=>row.category===category);
       $('directoryItems').innerHTML=rows.map(row=>'<div class="day-row"><strong>'+esc(row.value)+'</strong></div>').join('')||'<p class="note">У цій категорії ще немає варіантів.</p>';
-      refreshDirectoryChoices();updateDirectoryAccess();
+      refreshDirectoryChoices();renderBoardLinks();updateDirectoryAccess();
     }
     async function loadDirectories(){
       if(directoryLoading||!cloudEnabled||!currentUser||!currentRole)return;
@@ -374,6 +376,23 @@
       const count=flights.filter(f=>f.id!==record?.id&&f.platformNumber===board&&f.platformKind===kind).length;
       $('boardCountHint').textContent=automatic?(board?'Борт '+board+': після збереження '+(count+1)+' записів за весь час. Цей рейс = 1 виліт / виїзд.':'Один запис = один виліт / виїзд. Оберіть номер борта.'):'Старий запис: збережено попередню кількість. Підсумок за бортом рахує записи.';
     }
+    function applyBoardTerminal(){
+      const link=boardTerminalLinks.find(row=>row.platform_kind===$('platformKind').value&&row.board_number===$('platformNumber').value);
+      $('starlinkNumber').value='';
+      if(link){const select=$('starlinkNumber');if(![...select.options].some(option=>option.value===link.starlink_number)){const option=document.createElement('option');option.value=link.starlink_number;option.textContent=link.starlink_number;select.append(option);}select.value=link.starlink_number;$('terminalHint').textContent='Starlink підставлено за прив’язкою. За потреби можна змінити вручну.';}
+      else $('terminalHint').textContent=$('platformNumber').value?'Для цього борта немає прив’язки. Оберіть Starlink вручну.':'';
+    }
+    function renderBoardLinks(){
+      ['linkBoard','linkTerminal'].forEach((id,index)=>{const field=index?'starlinkNumber':'platformNumber',current=$(id).value;const values=[...new Set([...directoryRows.filter(r=>r.category===field).map(r=>r.value),...flights.map(r=>r[field]).filter(Boolean),...boardTerminalLinks.map(r=>index?r.starlink_number:r.board_number)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));$(id).innerHTML='<option value="">'+(index?'Без прив’язки':'Оберіть борт')+'</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');$(id).value=current;});
+      $('boardLinkList').innerHTML=boardTerminalLinks.map(row=>'<div class="day-row"><div><strong>'+esc(row.board_number)+' → '+esc(row.starlink_number)+'</strong><small>'+esc(row.platform_kind)+'</small></div></div>').join('')||'<p class="note">Прив’язок ще немає.</p>';
+    }
+    let boardLinksLoading=false;
+    async function loadBoardLinks(){
+      if(boardLinksLoading||!cloudEnabled||!currentUser||!currentRole)return;boardLinksLoading=true;const uid=currentUser.id;
+      try{const {data,error}=await cloud.from('flight_board_terminals').select('platform_kind,board_number,starlink_number');if(currentUser?.id!==uid)return;if(error)throw error;boardTerminalLinks=data||[];boardLinksReady=true;$('boardLinkStatus').textContent='Спільні прив’язки завантажено.';renderBoardLinks();}
+      catch(error){boardLinksReady=false;$('boardLinkStatus').textContent='Прив’язки недоступні. Адміністратору потрібно виконати supabase-board-terminals.sql у SQL Editor.';}finally{boardLinksLoading=false;}
+    }
+    $('boardLinkForm').onsubmit=async event=>{event.preventDefault();if(!cloudEnabled||currentRole!=='admin')return;const platform=$('linkPlatform').value,board=$('linkBoard').value,terminal=$('linkTerminal').value;if(!board)return;if(!boardLinksReady){await loadBoardLinks();if(!boardLinksReady)return;}$('saveBoardLink').disabled=true;try{const query=terminal?cloud.from('flight_board_terminals').upsert({platform_kind:platform,board_number:board,starlink_number:terminal},{onConflict:'platform_kind,board_number'}):cloud.from('flight_board_terminals').delete().eq('platform_kind',platform).eq('board_number',board);const {error}=await query;if(error)throw error;await loadBoardLinks();}catch(error){$('boardLinkStatus').textContent='Не вдалося зберегти: '+error.message;}finally{$('saveBoardLink').disabled=false;}};
     function platformOf(f){return f.platformKind||(f.task==='Місія НРК'?'НРК':/вамп|vamp/i.test(String(f.aircraft||'')+' '+String(f.task||''))?'Вампір':'Не вказано');}
     let viewedRecordId=null;
     function canRepeatRecord(){return !cloudEnabled||['admin','executor'].includes(currentRole);}
@@ -382,7 +401,7 @@
       if($('recordViewer').open)$('recordViewer').close();
       openForm();$('platformKind').value=platformOf(record)==='Вампір'?'Вампір':'НРК';updateTaskChoices('Доставка');
       refreshDirectoryChoices({...Object.fromEntries(Object.keys(directoryFields).map(field=>[field,''])),executor:record.executor||'',platformNumber:record.platformNumber||''});
-      $('aircraft').value=record.aircraft||'';updateAutomaticCount();$('formTitle').textContent='Повторити рейс — новий запис';
+      $('aircraft').value=record.aircraft||'';updateAutomaticCount();applyBoardTerminal();$('formTitle').textContent='Повторити рейс — новий запис';
     }
     function viewRecord(record){
       if(!record)return;viewedRecordId=record.id;
