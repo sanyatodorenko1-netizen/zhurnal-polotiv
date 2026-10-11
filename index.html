@@ -387,7 +387,8 @@
       $('boardCountHint').textContent=automatic?(board?'Борт '+board+': після збереження '+(count+1)+' записів за весь час. Цей рейс = 1 виліт / виїзд.':'Один запис = один виліт / виїзд. Оберіть номер борта.'):'Старий запис: збережено попередню кількість. Підсумок за бортом рахує записи.';
     }
     function renderEquipment(){
-      const summary=['НРК','Вампір','HEAVY SHOT'].map(kind=>{const rows=equipmentRows.filter(r=>r.platform_kind===kind),count=status=>rows.filter(r=>r.status===status).length;return '<div class="stat"><span>'+kind+' · наявні</span><strong>'+rows.filter(r=>r.status!=='lost').length+'</strong><p class="note">На ВП: '+count('vp')+' · Склад: '+count('warehouse')+'<br>Ремонт: '+count('repair')+' · Втрачено: '+count('lost')+'</p></div>';}).join('');
+      const images={'НРК':'assets/equipment/nrk.svg','Вампір':'assets/equipment/vampire.svg','HEAVY SHOT':'assets/equipment/heavy-shot.svg'};
+      const summary=['НРК','Вампір','HEAVY SHOT'].map(kind=>{const rows=equipmentRows.filter(r=>r.platform_kind===kind),count=status=>rows.filter(r=>r.status===status).length;return '<div class="stat equipment-stat"><img class="equipment-illustration" src="'+images[kind]+'" alt="Ілюстрація '+esc(kind)+'" width="600" height="260" loading="lazy" decoding="async"><div class="equipment-card-content"><span>'+esc(kind)+' · наявні</span><strong>'+rows.filter(r=>r.status!=='lost').length+'</strong><p class="note">На ВП: '+count('vp')+' · Склад: '+count('warehouse')+'<br>Ремонт: '+count('repair')+' · Втрачено: '+count('lost')+'</p></div></div>';}).join('');
       const availabilityNotice=equipmentReady?'Спільні дані техніки. Оновлюються автоматично кожні 10 секунд.':cloudEnabled&&currentUser&&currentRole?'Дані техніки ще не завантажено.':'Увійдіть з призначеною роллю, щоб переглядати спільну техніку.';
       const placeholder='<p class="note">'+availabilityNotice+'</p>';
       $('equipmentSummary').innerHTML=equipmentReady?summary:placeholder;
