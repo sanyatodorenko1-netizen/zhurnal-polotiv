@@ -121,6 +121,14 @@
     </div>
   </main>
   </div>
+  <dialog id="reportDialog" aria-labelledby="reportTitle"><form id="reportForm">
+    <div class="form-head"><h2 id="reportTitle">Експорт звіту XLSX</h2><button type="button" class="icon-btn" id="closeReport" aria-label="Закрити звіт">✕</button></div>
+    <div class="form-body"><p class="note">Оберіть період за датою рейсу. Обидві дати включено. Фільтри перегляду журналу не впливають на звіт.</p>
+      <div class="form-grid"><div><label for="reportFrom">Дата від</label><input type="date" id="reportFrom" required></div><div><label for="reportTo">Дата до</label><input type="date" id="reportTo" required></div></div>
+      <p id="reportStatus" class="note" role="status" aria-live="polite"></p>
+      <button type="button" class="btn" id="reportAll">Завантажити весь журнал</button>
+    </div><div class="form-foot"><button type="submit" class="btn primary" id="reportDownload">Завантажити за період</button></div>
+  </form></dialog>
   <dialog id="recordViewer"><div class="form-head"><h2>Подробиці рейсу</h2><button type="button" class="icon-btn" id="closeViewer" aria-label="Закрити подробиці">✕</button></div><div class="form-body" id="recordDetails"></div><div class="form-foot"><button type="button" class="btn primary" id="repeatViewed">Повторити рейс</button></div></dialog>
   <dialog id="equipmentSpecsDialog" aria-labelledby="equipmentSpecsTitle">
     <div class="form-head"><h2 id="equipmentSpecsTitle">ТТХ</h2><button type="button" class="icon-btn" id="closeEquipmentSpecs" aria-label="Закрити характеристики">✕</button></div>
@@ -185,7 +193,7 @@
   <script src="https://unpkg.com/maplibre-gl@5.12.0/dist/maplibre-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-config.js"></script>
-  <script src="assets/flight-report-export.js"></script>
+  <script src="assets/flight-report-export.js?v=date-range-20261018"></script>
   <script src="assets/equipment-specs.js"></script>
   <script>
     const evacuationRates={'5-6':70,'4-5':80,'3-4':90,'2-3':100,'1-2':110,'0-1':120};
@@ -360,7 +368,21 @@
     showView('overview');
     $('flightForm').onsubmit=async e=>{e.preventDefault();if(savingRecord)return;const id=$('recordId').value;const previous=id?flights.find(x=>x.id===id):null;if(cloudEnabled&&((previous&&!['admin','moderator'].includes(currentRole))||(!previous&&!['admin','executor'].includes(currentRole)))){ $('formSaveStatus').textContent='У вашої ролі немає права на цю дію.';return}if(isAirPlatform($('platformKind').value)&&$('task').value==='Бомбардування'&&$('bombsUsed').value!==''&&$('bombsFailed').value!==''&&Number($('bombsFailed').value)>Number($('bombsUsed').value)){alert('Кількість боєприпасів, що не розірвалися, не може перевищувати загальну витрату БК.');return}if(isAutoEvac()&&!evacuationRates[$('evacDistanceBand').value]){$('formSaveStatus').textContent='Оберіть діапазон відстані для розрахунку балів.';return}updateEvacPoints();const recordId=id||crypto.randomUUID();const f={...previous};for(const k of ['date','startTime','platformKind','task','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombsUsed','bombsFailed','targetsHit','vampireFlights','packagesDelivered','nrkSuccessfulMissions','nrkFailedMissions','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])f[k]=$(k).value;f.ePoints=String(pointNumber(f.ePoints));if(isAutoEvac()){f.ePointsCalculation={method:'nrk-evacuation',distanceBand:$('evacDistanceBand').value,points:evacuationRates[$('evacDistanceBand').value],source:'Програма згідно наказу №326 (2), стор. 12',status:'calculated'};}else if(f.ePointsCalculation?.method==='nrk-evacuation'){delete f.ePointsCalculation;}f.impactResults=[...document.querySelectorAll('[name="impactResults"]:checked')].map(el=>el.value);f.id=recordId;if(!previous||previous.countMode==='per-record'){f.countMode='per-record';f.nrkTrips=f.platformKind==='НРК'?'1':'0';f.vampireFlights=isAirPlatform(f.platformKind)?'1':'0';}f.created_by=previous?.created_by||currentUser?.id||null;savingRecord=true;recordRevision++;$('saveRecordBtn').disabled=true;$('cancelBtn').disabled=true;$('closeBtn').disabled=true;$('saveRecordBtn').textContent='Зберігаємо…';$('formSaveStatus').textContent='Очікуємо підтвердження збереження…';try{await save(f,!!id);$('editor').close();$('syncState').textContent=cloudEnabled?'Зміни збережено в базі':'Зміни збережено локально';}catch(error){$('formSaveStatus').textContent='Не вдалося зберегти: '+(error.message||'Перевірте підключення та спробуйте знову.');}finally{savingRecord=false;$('saveRecordBtn').disabled=false;$('cancelBtn').disabled=false;$('closeBtn').disabled=false;$('saveRecordBtn').textContent='Зберегти рейс';}};$('records').onclick=async e=>{const target=e.target.closest('button');if(!target)return;const view=target.dataset.viewRecord,repeat=target.dataset.repeat;if(view){viewRecord(flights.find(f=>f.id===view));return}if(repeat){repeatRecord(flights.find(f=>f.id===repeat));return}const edit=target.dataset.edit, del=target.dataset.delete;if(edit)openForm(flights.find(f=>f.id===edit));if(del&&confirm('Видалити запис про рейс?')){flights=flights.filter(f=>f.id!==del);localStorage.setItem(KEY,JSON.stringify(flights));render();if(cloudEnabled&&currentUser){const {error}=await cloud.from('flight_records').delete().eq('id',del);if(error)$('syncError').textContent='Не вдалося видалити спільний запис: '+error.message;}}};
     $('editor').addEventListener('cancel',e=>{if(savingRecord)e.preventDefault();});
-    $('exportBtn').onclick=async()=>{const button=$('exportBtn');const original=button.textContent;button.disabled=true;button.textContent='Формуємо XLSX…';try{await exportFlightReport(flights);}catch(error){console.error('Не вдалося сформувати XLSX-звіт',error);alert(error.message||'Не вдалося сформувати XLSX-звіт. Спробуйте ще раз.');}finally{button.disabled=false;button.textContent=original;}};
+    let exportingReport=false;
+    $('exportBtn').onclick=()=>{$('reportStatus').textContent='';$('reportDialog').showModal();};
+    $('closeReport').onclick=()=>$('reportDialog').close();
+    async function downloadReport(range){
+      if(exportingReport)return;
+      exportingReport=true;
+      const button=$('reportDownload'),original=button.textContent;
+      button.disabled=$('reportAll').disabled=true;button.textContent='Формуємо XLSX…';
+      $('reportStatus').textContent='';
+      try{await exportFlightReport(flights,range);$('reportStatus').textContent='Звіт сформовано. Перевірте завантаження браузера.';}
+      catch(error){console.error('Не вдалося сформувати XLSX-звіт',error);$('reportStatus').textContent=error.message||'Не вдалося сформувати XLSX-звіт. Спробуйте ще раз.';}
+      finally{exportingReport=false;button.disabled=$('reportAll').disabled=false;button.textContent=original;}
+    }
+    $('reportForm').onsubmit=event=>{event.preventDefault();downloadReport({from:$('reportFrom').value,to:$('reportTo').value});};
+    $('reportAll').onclick=()=>downloadReport();
     function canManageDirectories(){return !cloudEnabled||!!currentUser&&['admin','moderator','executor'].includes(currentRole);}
     function updateDirectoryAccess(){
       $('directoryForm').hidden=!canManageDirectories();$('boardLinkForm').hidden=!canManageDirectories();$('equipmentEditorPanel').hidden=cloudEnabled?currentRole!=='admin':false;
