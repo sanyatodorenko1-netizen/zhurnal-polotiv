@@ -249,7 +249,7 @@
     return sheet;
   }
 
-  function createWorkbook(ExcelJS, flights) {
+  function createWorkbook(ExcelJS, flights, selectedPeriod) {
     const records = Array.isArray(flights) ? flights : [];
     const platformRecords = { 'НРК': [], VAMPIRE: [], 'HEAVY SHOT': [] };
     let uncategorized = 0;
@@ -259,7 +259,7 @@
       else uncategorized += 1;
     });
     const dates = records.map(record => parseDate(record.date)).filter(Boolean).sort((a, b) => a - b);
-    const period = dates.length ? `${dateLabel(dates[0])} — ${dateLabel(dates[dates.length - 1])}` : 'не визначено: у журналі немає дат';
+    const period = selectedPeriod || (dates.length ? `${dateLabel(dates[0])} — ${dateLabel(dates[dates.length - 1])}` : 'не визначено: у журналі немає дат');
     const workbook = new ExcelJS.Workbook();
     workbook.calcProperties = { fullCalcOnLoad: true };
     workbook.creator = 'Журнал польотів';
@@ -285,14 +285,26 @@
     return global.__flightExcelJsPromise;
   }
 
-  global.exportFlightReport = async function (flights) {
+  global.exportFlightReport = async function (flights, range) {
+    // Compare calendar dates without converting them to UTC.
+    let records = Array.isArray(flights) ? [...flights] : [];
+    let selectedPeriod;
+    if (range) {
+      const from = text(range.from), to = text(range.to);
+      if (!parseDate(from) || !parseDate(to)) throw new Error('Оберіть обидві дати звіту.');
+      if (from > to) throw new Error('«Дата від» не може бути пізніше за «Дата до».');
+      records = records.filter(record => parseDate(record.date) && record.date >= from && record.date <= to);
+      if (!records.some(record => classify(record))) throw new Error('За вибраний період немає записів для звіту.');
+      selectedPeriod = `${dateLabel(parseDate(from))} — ${dateLabel(parseDate(to))}`;
+      range = { from, to };
+    }
     const ExcelJS = await loadExcelJS();
-    const workbook = createWorkbook(ExcelJS, flights);
+    const workbook = createWorkbook(ExcelJS, records, selectedPeriod);
     const buffer = await workbook.xlsx.writeBuffer();
-    const dates = (Array.isArray(flights) ? flights : []).map(record => parseDate(record.date)).filter(Boolean).sort((a, b) => a - b);
+    const dates = records.map(record => parseDate(record.date)).filter(Boolean).sort((a, b) => a - b);
     const fileDate = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    const start = dates.length ? fileDate(dates[0]) : 'no-dates';
-    const end = dates.length ? fileDate(dates[dates.length - 1]) : 'no-dates';
+    const start = range ? range.from : dates.length ? fileDate(dates[0]) : 'no-dates';
+    const end = range ? range.to : dates.length ? fileDate(dates[dates.length - 1]) : 'no-dates';
     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
