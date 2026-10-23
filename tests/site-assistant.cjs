@@ -27,8 +27,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert(await page.locator('#assistantNav').isHidden());
   await page.locator('#loginEmail').fill('demo@example.test');await page.locator('#loginPassword').fill('fixture-only');await page.locator('#loginForm button[type=submit]').click();
   await page.waitForSelector('#assistantNav:not([hidden])');await page.locator('#assistantNav').click();
-  await page.waitForFunction(()=>document.getElementById('assistantStatus').textContent.includes('ще не підключено'));
-  assert(await page.locator('#assistantSend').isDisabled());
+  assert(await page.locator('#assistantSend').isEnabled());
   await page.locator('.assistant-help-card').filter({hasText:'Як завантажити звіт'}).click();
   assert((await page.locator('#assistantGuideBody').textContent()).includes('обидва дні'));
   for(const width of [360,768,1440]){await page.setViewportSize({width,height:1000});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'assistant overflow '+width);}
@@ -40,18 +39,17 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert((await page.locator('#assistantFormResult').textContent()).includes('обов’язкові'));
   assert((await page.locator('#assistantFormIssues').textContent()).includes('Дата'));
   assert.equal(sent.length,0,'local checks must never invoke AI');
-  await page.locator('#cancelBtn').click();configured=true;await page.locator('#assistantReconnect').click();await page.waitForFunction(()=>!document.getElementById('assistantSend').disabled);
-  await page.locator('#assistantQuestion').fill('Як завантажити звіт?');await page.locator('#assistantWeb').check();await page.locator('#assistantSend').click();
-  await page.waitForSelector('.assistant-message.assistant');
-  assert.deepEqual(Object.keys(sent[0]).sort(),['message','web']);assert.equal(sent[0].web,true);
-  assert.equal(await page.locator('.assistant-message img').count(),0);
-  assert.equal(await page.locator('.assistant-message a[href^="javascript:"]').count(),0);
-  assert((await page.locator('.assistant-message a').all()).length>0);
-  await page.locator('#assistantQuestion').fill('33U XP 05004 44997');await page.locator('#assistantSend').click();assert.equal(sent.length,1);
-  fail=true;await page.locator('#assistantQuestion').fill('Поясни експорт');await page.locator('#assistantSend').click();await page.waitForFunction(()=>document.getElementById('assistantStatus').textContent.includes('Ліміт'));
-  fail=false;delay=300;await page.locator('#assistantQuestion').fill('Як працює карта?');await page.locator('#assistantSend').click();await page.locator('#signOutBtn').click();await page.waitForTimeout(400);
-  assert.equal(await page.locator('#assistantMessages').textContent(),'');assert.equal(await page.locator('#feedbackList').textContent(),'');assert(await page.locator('#assistantNav').isHidden());
+  await page.locator('#cancelBtn').click();
+  await page.locator('#assistantQuestion').fill('правила гри & підказки');await page.locator('#assistantSend').click();
+  assert(await page.locator('#assistantSearchLinks').isVisible());
+  const google=new URL(await page.locator('#assistantGoogle').getAttribute('href'));
+  assert.equal(google.hostname,'www.google.com');assert.equal(google.searchParams.get('q'),'правила гри & підказки');
+  assert.equal(await page.locator('#assistantGoogle').getAttribute('rel'),'noopener noreferrer');
+  await page.locator('#assistantQuestion').fill('інший запит');assert(await page.locator('#assistantSearchLinks').isHidden());
+  await page.locator('#assistantQuestion').fill('33U XP 05004 44997');await page.locator('#assistantSend').click();assert(await page.locator('#assistantSearchLinks').isHidden());
+  assert.equal(sent.length,0,'no paid AI calls');
+  await page.locator('#signOutBtn').click();assert.equal(await page.locator('#feedbackList').textContent(),'');assert(await page.locator('#assistantNav').isHidden());
   assert.deepEqual(errors,[]);
-  console.log('PASS: assistant unavailable/configured modes, local help and form checks, suggestion confirmation, explicit search, no journal payload, escaped output/citations, rate-limit errors, logout race and mobile layouts. Mocked AI only.');
+  console.log('PASS: free search URLs, private query guard, no paid AI calls, local help/forms, feedback, logout and mobile layouts.');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});
