@@ -6,7 +6,7 @@ permissions:
   contents: read
 jobs:
   browser-checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -14,10 +14,11 @@ jobs:
         with:
           node-version: '22'
       - run: npm install --no-save --package-lock=false playwright@1.62.1
-      - run: npx playwright install --with-deps chromium
+      # The hosted Ubuntu image already includes Chrome and its dependencies.
+      - run: google-chrome --version
       - run: node tests/dark-admin-archive.cjs
         env:
-          PLAYWRIGHT_CHANNEL: chromium
+          PLAYWRIGHT_CHANNEL: chrome
       - run: node tests/map-mgrs.cjs
         env:
-          PLAYWRIGHT_CHANNEL: chromium
+          PLAYWRIGHT_CHANNEL: chrome
