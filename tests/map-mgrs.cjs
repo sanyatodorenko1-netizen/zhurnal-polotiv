@@ -4,6 +4,19 @@ const path = require('node:path');
 const http = require('node:http');
 const {chromium} = require('playwright');
 const coordinates = require('../assets/map-coordinates.js');
+const wind = require('../assets/weather-wind.js');
+assert.equal(wind.describe(3.2, 0).directionText, 'З півночі · 0°');
+assert.equal(wind.describe(3.2, 90).directionText, 'Зі сходу · 90°');
+assert.equal(wind.describe(3.2, 180).directionText, 'З півдня · 180°');
+assert.equal(wind.describe(3.2, 270).directionText, 'Із заходу · 270°');
+assert.equal(wind.describe(3.2, 360).angle, 0);
+assert.equal(wind.describe(3.2, 315).directionText, 'З північного заходу · 315°');
+assert.equal(wind.describe(3.2, null).angle, null);
+assert.equal(wind.describe(null, 0).speedText, '—');
+assert.equal(wind.describe(-1, 0).speedText, '—');
+assert.equal(wind.describe(0, 90).directionText, 'Штиль');
+assert.equal(wind.describe(36, 90, 'km/h').speedText, '10,0 м/с');
+assert.equal(wind.describe(3.2, 90).speedText, '3,2 м/с');
 // Published upstream vectors: https://github.com/proj4js/mgrs/blob/master/test/test.js
 assert.equal(coordinates.toMGRS(36.2361322, -115.0820944), '11S PA 72349 11844');
 assert.equal(coordinates.toMGRS(0, 0), '31N AA 66021 00000');
@@ -55,7 +68,11 @@ const server = http.createServer((req,res)=>{
     return route.continue();
    }
    if(u.href.includes('@supabase/supabase-js'))return route.fulfill({contentType:'text/javascript',body:authStub});
-   if(u.hostname==='api.open-meteo.com')return route.fulfill({json:{current:{temperature_2m:18,relative_humidity_2m:61,precipitation:0,wind_speed_10m:9,weather_code:2,time:'2026-10-23T12:00'}}});
+   if(u.hostname==='api.open-meteo.com'){
+    assert.equal(u.searchParams.get('wind_speed_unit'),'ms');
+    assert(u.searchParams.get('current').split(',').includes('wind_direction_10m'));
+    return route.fulfill({json:{current_units:{wind_speed_10m:'m/s'},current:{temperature_2m:18,relative_humidity_2m:61,precipitation:0,wind_speed_10m:3.2,wind_direction_10m:315,weather_code:2,time:'2026-10-23T12:00'}}});
+   }
    if(u.hostname==='geocoding-api.open-meteo.com')return route.fulfill({json:{results:[{name:'Демонстраційна точка',country:'Австрія',latitude:48.24949,longitude:16.41450}]}});
    if(process.env.MAP_REAL==='1' && ['unpkg.com','tiles.openfreemap.org'].includes(u.hostname))return route.continue();
    if(u.href.includes('maplibre-gl.js'))return route.fulfill({contentType:'text/javascript',body:mapStub});
@@ -68,6 +85,9 @@ const server = http.createServer((req,res)=>{
   await page.locator('#mgrsSearch').fill('33u xp 05004 44997');
   await page.locator('#mgrsSearchForm button').click();
   await page.waitForFunction(()=>document.getElementById('locationMGRS').value==='33U XP 05004 44997');
+  await page.waitForFunction(()=>document.getElementById('weatherWind').textContent==='3,2 м/с');
+  assert.equal(await page.locator('#weatherWindDirection').textContent(), 'З північного заходу · 315°');
+  assert.equal(await page.locator('#weatherWindArrow').evaluate(el=>el.style.transform), 'rotate(315deg)');
   assert.match(await page.locator('#locationCoordinates').inputValue(),/^48\.249488, 16\.414501$/);
   await page.locator('#copyCoordinatesBtn').click();
   assert.equal(await page.evaluate(()=>window.copiedCoordinates),'33U XP 05004 44997');
