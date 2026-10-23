@@ -22,3 +22,7 @@ jobs:
       - run: node tests/map-mgrs.cjs
         env:
           PLAYWRIGHT_CHANNEL: chrome
+      - run: node --experimental-strip-types tests/site-assistant-server.mjs
+      - run: node tests/site-assistant.cjs
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
