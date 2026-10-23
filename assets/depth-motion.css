@@ -1,0 +1,23 @@
+/* Decorative depth only: no layout or data changes. */
+.overview-hero,body.auth-gate .welcome-copy{isolation:isolate}
+.overview-hero::before,body.auth-gate .welcome-copy::before{content:"";position:absolute;inset:-35%;z-index:-1;pointer-events:none;background:conic-gradient(from 40deg,transparent 0deg,#58eb8b16 70deg,transparent 145deg,#98f36c12 240deg,transparent 320deg);animation:ambient-orbit 28s linear infinite;transform-origin:center}
+.overview-hero{box-shadow:0 24px 60px #0005,inset 0 1px #a8f8bd20}
+.hero-art img,.welcome-art{filter:drop-shadow(0 25px 20px #0007);animation:art-levitate 8s ease-in-out infinite}
+.stat{--depth-x:0deg;--depth-y:0deg;transform:perspective(900px) rotateX(var(--depth-x)) rotateY(var(--depth-y));transition:transform .22s ease-out,border-color .25s,box-shadow .25s;box-shadow:0 12px 28px #0003,inset 0 1px #b5ffbc12}
+.stat:hover{border-color:#73bb8a;box-shadow:0 20px 40px #0005,inset 0 1px #c4ffd82a}
+.stat>strong{text-shadow:0 3px 18px #71ee8320}
+.btn,.side-link,.assistant-help-card{transition:background .2s,border-color .2s,box-shadow .2s,transform .2s}
+.btn:active,.assistant-help-card:active{transform:translateY(1px)}
+.btn.primary:hover{box-shadow:0 7px 24px #8eea5c26}
+.motion-enter{animation:panel-arrive .55s cubic-bezier(.2,.7,.2,1) both}
+.chart-bar{transform-origin:bottom;animation:chart-arrive .7s ease-out both}
+@keyframes ambient-orbit{to{transform:rotate(360deg)}}
+@keyframes art-levitate{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-12px) rotate(1deg)}}
+@keyframes panel-arrive{from{opacity:.35;translate:0 12px}to{opacity:1;translate:0 0}}
+@keyframes chart-arrive{from{transform:scaleY(.15)}to{transform:scaleY(1)}}
+@media(hover:none),(pointer:coarse){.stat{transform:none}.stat:hover{box-shadow:0 12px 28px #0003}.hero-art img,.welcome-art{animation:none}.overview-hero::before,body.auth-gate .welcome-copy::before{animation-duration:45s}}
+@media(max-width:760px){.overview-hero::before,body.auth-gate .welcome-copy::before{animation:none}.motion-enter{animation-duration:.3s}}
+@media(prefers-reduced-motion:reduce){.stat{transform:none!important}.motion-enter,.chart-bar,.hero-art img,.welcome-art,.overview-hero::before,body.auth-gate .welcome-copy::before{animation:none!important}.motion-enter{opacity:1;translate:none}}
+html.motion-paused *,html.motion-paused *::before,html.motion-paused *::after{animation-play-state:paused!important}
+
+.motion-toggle{position:fixed;right:14px;bottom:14px;z-index:30;border:1px solid #52775d;border-radius:99px;padding:8px 12px;background:#102019f2;color:#d5e9da;font:inherit;font-size:11px;box-shadow:0 3px 12px #0005}.motion-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:3px}@media(prefers-reduced-motion:reduce){.motion-toggle{display:none}}
