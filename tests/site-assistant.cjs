@@ -49,6 +49,9 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await page.locator('#assistantQuestion').fill('33U XP 05004 44997');await page.locator('#assistantSend').click();assert(await page.locator('#assistantSearchLinks').isHidden());
   assert.equal(sent.length,0,'no paid AI calls');
   await page.locator('#signOutBtn').click();assert.equal(await page.locator('#feedbackList').textContent(),'');assert(await page.locator('#assistantNav').isHidden());
+  await page.locator('.motion-toggle').click();assert(await page.locator('html').evaluate(e=>e.classList.contains('motion-paused')));
+  await page.reload();assert(await page.locator('html').evaluate(e=>e.classList.contains('motion-paused')));
+  await page.emulateMedia({reducedMotion:'reduce'});assert(await page.locator('.motion-toggle').isHidden());
   assert.deepEqual(errors,[]);
   console.log('PASS: free search URLs, private query guard, no paid AI calls, local help/forms, feedback, logout and mobile layouts.');
  }finally{await browser.close();server.close();}
