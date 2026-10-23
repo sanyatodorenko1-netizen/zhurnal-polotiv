@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="620" viewBox="0 0 720 620" fill="none">
+<defs>
+ <radialGradient id="halo"><stop stop-color="#67f5ba" stop-opacity=".25"/><stop offset=".48" stop-color="#2bb38a" stop-opacity=".08"/><stop offset="1" stop-color="#2bb38a" stop-opacity="0"/></radialGradient>
+ <linearGradient id="glass" x1="194" y1="120" x2="525" y2="510" gradientUnits="userSpaceOnUse"><stop stop-color="#d7ffee"/><stop offset=".17" stop-color="#8ffbd0"/><stop offset=".44" stop-color="#25a77f"/><stop offset=".7" stop-color="#103c34"/><stop offset=".88" stop-color="#4fd2a7"/><stop offset="1" stop-color="#baffdf"/></linearGradient>
+ <linearGradient id="edge" x1="228" y1="143" x2="472" y2="494" gradientUnits="userSpaceOnUse"><stop stop-color="#eafff6"/><stop offset=".35" stop-color="#7ef8cb" stop-opacity=".1"/><stop offset=".7" stop-color="#204b43"/><stop offset="1" stop-color="#91ffda"/></linearGradient>
+ <linearGradient id="ring"><stop stop-color="#8affd8" stop-opacity=".03"/><stop offset=".55" stop-color="#a8ffe0" stop-opacity=".8"/><stop offset="1" stop-color="#88ffd5" stop-opacity=".03"/></linearGradient>
+ <linearGradient id="core" x1="310" y1="250" x2="405" y2="410" gradientUnits="userSpaceOnUse"><stop stop-color="#17362e"/><stop offset="1" stop-color="#091c18"/></linearGradient>
+ <filter id="shadow"><feGaussianBlur stdDeviation="18"/></filter>
+ <filter id="bloom"><feGaussianBlur stdDeviation="2.5"/></filter>
+</defs>
+<ellipse cx="360" cy="325" rx="320" ry="290" fill="url(#halo)"/>
+<ellipse cx="364" cy="500" rx="155" ry="18" fill="#37d99b" opacity=".13" filter="url(#shadow)"/>
+<g transform="rotate(-28 360 310)"><ellipse cx="360" cy="310" rx="287" ry="133" stroke="#64d3ac" stroke-opacity=".13"/><ellipse cx="360" cy="310" rx="270" ry="124" stroke="url(#ring)" stroke-width="1.5"/><ellipse cx="360" cy="310" rx="294" ry="139" stroke="#64d3ac" stroke-opacity=".07"/></g>
+<path fill-rule="evenodd" d="M360 118C465 118 536 201 536 308S465 498 360 498 184 415 184 308 255 118 360 118Zm0 77c-57 0-96 47-96 113s39 113 96 113 96-47 96-113-39-113-96-113Z" fill="url(#glass)"/>
+<path fill-rule="evenodd" d="M360 118C465 118 536 201 536 308S465 498 360 498 184 415 184 308 255 118 360 118Zm0 77c-57 0-96 47-96 113s39 113 96 113 96-47 96-113-39-113-96-113Z" stroke="url(#edge)" stroke-width="2"/>
+<path d="M208 294c0-94 62-159 147-160" stroke="#e1fff3" stroke-opacity=".5" stroke-width="2" stroke-linecap="round"/>
+<path d="M510 329c-6 91-66 151-146 153" stroke="#a3ffde" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>
+<path d="M289 309c0-52 28-89 70-95" stroke="#041d16" stroke-opacity=".5" stroke-width="6"/>
+<g transform="rotate(-28 360 310)"><path d="M90 310c0 68 121 124 270 124s270-56 270-124" stroke="url(#ring)" stroke-width="1.5"/></g>
+<g transform="translate(322 269)"><rect width="77" height="80" rx="21" fill="url(#core)" stroke="#80e8bd" stroke-opacity=".5"/><path d="M26 25h25M26 39h25M26 53h15" stroke="#abffdc" stroke-width="3" stroke-linecap="round"/></g>
+<circle cx="127" cy="354" r="4" fill="#b6ffe4"/><circle cx="582" cy="192" r="3" fill="#b6ffe4"/><circle cx="540" cy="458" r="2" fill="#b6ffe4"/>
+<circle cx="127" cy="354" r="8" fill="#b6ffe4" opacity=".3" filter="url(#bloom)"/>
+</svg>
