@@ -36,6 +36,7 @@
   <link rel="stylesheet" href="assets/design-refresh.css?v=dashboard-20261011">
   <link rel="stylesheet" href="assets/dark-green.css?v=assistant-20261023">
   <link rel="stylesheet" href="assets/depth-motion.css?v=20261023">
+  <link rel="stylesheet" href="assets/equipment-showcase.css?v=20261023">
 </head>
 <body>
   <div class="app-frame">
@@ -92,7 +93,143 @@
   </div>
 </section>
 <section class="page-view" id="overviewView" aria-label="Огляд">
-    <section class="overview-hero" aria-labelledby="overviewHeroTitle"><div class="hero-copy"><p class="hero-kicker"><span></span> СПІЛЬНИЙ ЖУРНАЛ КОМАНДИ</p><h2 id="overviewHeroTitle">Ваш робочий простір.<br><em>Усе під контролем.</em></h2><p>Записи, техніка та звітність.<br>Злагоджена робота починається з порядку.</p><div class="hero-actions"><button class="btn primary" type="button" data-view="records">Відкрити журнал <span aria-hidden="true">↗</span></button><button class="hero-text-link" type="button" data-view="archive" id="heroArchiveLink" hidden>Архів зведень <span aria-hidden="true">→</span></button></div></div><div class="hero-art" aria-hidden="true"><img src="assets/premium-orbit.svg" alt=""><span class="art-label">ЗАПИСИ / СТРУКТУРА / ПОРЯДОК</span></div></section><div class="section-title-row"><h2 class="section-heading">Зведення журналу</h2><span>Дані спільного простору</span></div>
+    <section class="overview-hero" aria-labelledby="overviewHeroTitle"><div class="hero-copy"><p class="hero-kicker"><span></span> СПІЛЬНИЙ ЖУРНАЛ КОМАНДИ</p><h2 id="overviewHeroTitle">Ваш робочий простір.<br><em>Усе під контролем.</em></h2><p>Записи, техніка та звітність.<br>Злагоджена робота починається з порядку.</p><div class="hero-actions"><button class="btn primary" type="button" data-view="records">Відкрити журнал <span aria-hidden="true">↗</span></button><button class="hero-text-link" type="button" data-view="archive" id="heroArchiveLink" hidden>Архів зведень <span aria-hidden="true">→</span></button></div></div><section class="equipment-showcase" aria-label="Техніка команди"><div class="showcase-caption">ТЕХНІКА КОМАНДИ <span aria-hidden="true">↗</span></div><div class="equipment-slides"><figure class="equipment-slide" data-equipment="vampire"><div class="equipment-stage"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="600" height="260" viewBox="0 0 600 260" fill="none">
+  <defs>
+    <radialGradient id="hero-vampire-halo"><stop stop-color="#66836D" stop-opacity=".18"/><stop offset="1" stop-color="#66836D" stop-opacity="0"/></radialGradient>
+    <linearGradient id="hero-vampire-metal" x1="268" y1="73" x2="329" y2="173" gradientUnits="userSpaceOnUse"><stop stop-color="#697C6C"/><stop offset=".46" stop-color="#354D3D"/><stop offset="1" stop-color="#172D1F"/></linearGradient>
+    <linearGradient id="hero-vampire-arm" x1="157" y1="97" x2="443" y2="167" gradientUnits="userSpaceOnUse"><stop stop-color="#607460"/><stop offset=".5" stop-color="#253E2D"/><stop offset="1" stop-color="#536B55"/></linearGradient>
+  </defs>
+  <ellipse cx="300" cy="135" rx="252" ry="112" fill="url(#hero-vampire-halo)"/>
+  <ellipse cx="300" cy="224" rx="133" ry="11" fill="#07100B" fill-opacity=".46"/>
+  <path d="M107 224H493" stroke="#E5BD70" stroke-opacity=".14"/>
+  <path d="M88 69V52H105M495 52H512V69" stroke="#E5BD70" stroke-opacity=".28" stroke-width="1.5"/>
+  <g stroke="url(#hero-vampire-arm)" stroke-width="13" stroke-linecap="round">
+    <path d="M277 106L205 68M324 106L395 68M275 127L144 119M325 127L456 119M278 149L196 184M324 149L404 184"/>
+  </g>
+  <g stroke="#E5BD70" stroke-opacity=".44" stroke-width="2" stroke-linecap="round">
+    <path d="M275 101L205 64M326 101L395 64M272 121L144 113M328 121L456 113M275 145L196 180M327 145L404 180"/>
+  </g>
+  <g fill="#14281B" stroke="#7B8E78" stroke-width="2">
+    <ellipse cx="205" cy="69" rx="13" ry="7"/><ellipse cx="395" cy="69" rx="13" ry="7"/>
+    <ellipse cx="144" cy="120" rx="13" ry="7"/><ellipse cx="456" cy="120" rx="13" ry="7"/>
+    <ellipse cx="196" cy="185" rx="13" ry="7"/><ellipse cx="404" cy="185" rx="13" ry="7"/>
+  </g>
+  <g stroke="#8EA68B" stroke-opacity=".21" stroke-width="1.5">
+    <ellipse cx="205" cy="64" rx="50" ry="12"/><ellipse cx="395" cy="64" rx="50" ry="12"/>
+    <ellipse cx="144" cy="115" rx="53" ry="13"/><ellipse cx="456" cy="115" rx="53" ry="13"/>
+    <ellipse cx="196" cy="180" rx="53" ry="13"/><ellipse cx="404" cy="180" rx="53" ry="13"/>
+  </g>
+  <g fill="#72876D">
+    <path class="showcase-rotor" d="M155 62Q164 56 192 60L214 64Q233 69 252 65L255 69Q237 75 211 67L199 65Q173 61 157 66L155 62Z"/>
+    <path class="showcase-rotor" d="M345 62Q354 56 382 60L404 64Q423 69 442 65L445 69Q427 75 401 67L389 65Q363 61 347 66L345 62Z"/>
+    <path class="showcase-rotor" d="M91 114Q106 107 136 111L153 115Q172 120 193 116L197 120Q173 126 147 118L133 117Q107 112 93 119L91 114Z"/>
+    <path class="showcase-rotor" d="M403 114Q418 107 448 111L465 115Q484 120 505 116L509 120Q485 126 459 118L445 117Q419 112 405 119L403 114Z"/>
+    <path class="showcase-rotor" d="M143 178Q158 172 188 176L205 180Q224 185 245 181L249 185Q225 191 199 183L185 182Q159 177 145 184L143 178Z"/>
+    <path class="showcase-rotor" d="M351 178Q366 172 396 176L413 180Q432 185 453 181L457 185Q433 191 407 183L393 182Q367 177 353 184L351 178Z"/>
+  </g>
+  <g fill="#E5BD70" fill-opacity=".85"><circle cx="205" cy="63" r="3"/><circle cx="395" cy="63" r="3"/><circle cx="144" cy="114" r="3"/><circle cx="456" cy="114" r="3"/><circle cx="196" cy="179" r="3"/><circle cx="404" cy="179" r="3"/></g>
+  <path d="M273 146L257 198M327 146L343 198M257 198H280M343 198H320" stroke="#607560" stroke-width="5" stroke-linecap="round"/>
+  <path d="M269 96L282 84H318L331 96V148L317 166H283L269 148V96Z" fill="url(#hero-vampire-metal)" stroke="#8B9B82" stroke-width="2"/>
+  <path d="M279 99L288 93H312L321 99V142L313 153H287L279 142V99Z" fill="#1D3526" stroke="#4D6750" stroke-width="1.5"/>
+  <path d="M285 87H315M273 104V137M327 104V137" stroke="#E5BD70" stroke-opacity=".6" stroke-width="2" stroke-linecap="round"/>
+  <path d="M293 107H307M293 114H307M293 121H307" stroke="#A1AF96" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/>
+  <path d="M288 151H312" stroke="#E5BD70" stroke-opacity=".8" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="300" cy="136" r="5" fill="#658465" stroke="#A7BA9D" stroke-width="1.5"/>
+  <path d="M300 84V66" stroke="#7C9278" stroke-width="2" stroke-linecap="round"/>
+  <path d="M147 237H184M416 237H453" stroke="#E5BD70" stroke-opacity=".36" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div><figcaption><span>Повітряна платформа</span><strong>Вампір</strong></figcaption></figure><figure class="equipment-slide" data-equipment="heavy-shot" hidden><div class="equipment-stage"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="600" height="260" viewBox="0 0 600 260" fill="none">
+  <defs>
+    <radialGradient id="hero-heavy-shot-halo"><stop stop-color="#66836D" stop-opacity=".18"/><stop offset="1" stop-color="#66836D" stop-opacity="0"/></radialGradient>
+    <linearGradient id="hero-heavy-shot-metal" x1="253" y1="90" x2="348" y2="168" gradientUnits="userSpaceOnUse"><stop stop-color="#74856B"/><stop offset=".5" stop-color="#3B513A"/><stop offset="1" stop-color="#1B301E"/></linearGradient>
+    <linearGradient id="hero-heavy-shot-arm" x1="151" y1="77" x2="445" y2="170" gradientUnits="userSpaceOnUse"><stop stop-color="#526C50"/><stop offset=".5" stop-color="#263D2A"/><stop offset="1" stop-color="#637D5C"/></linearGradient>
+  </defs>
+  <ellipse cx="300" cy="135" rx="252" ry="112" fill="url(#hero-heavy-shot-halo)"/>
+  <ellipse cx="300" cy="223" rx="129" ry="12" fill="#07100B" fill-opacity=".46"/>
+  <path d="M107 223H493" stroke="#E5BD70" stroke-opacity=".14"/>
+  <path d="M88 69V52H105M495 52H512V69" stroke="#E5BD70" stroke-opacity=".28" stroke-width="1.5"/>
+  <g stroke="url(#hero-heavy-shot-arm)" stroke-width="12" stroke-linecap="round">
+    <path d="M275 104L200 65M325 104L400 65M264 119L150 108M336 119L450 108M265 140L150 155M335 140L450 155M278 154L207 188M322 154L393 188"/>
+  </g>
+  <g stroke="#E5BD70" stroke-opacity=".4" stroke-width="2" stroke-linecap="round">
+    <path d="M275 99L201 61M325 99L399 61M264 114L151 103M336 114L449 103M265 135L151 150M335 135L449 150M277 150L206 184M323 150L394 184"/>
+  </g>
+  <g stroke="#8DA582" stroke-opacity=".22" stroke-width="1.5">
+    <ellipse cx="200" cy="61" rx="45" ry="10"/><ellipse cx="400" cy="61" rx="45" ry="10"/>
+    <ellipse cx="150" cy="103" rx="45" ry="10"/><ellipse cx="450" cy="103" rx="45" ry="10"/>
+    <ellipse cx="150" cy="150" rx="45" ry="10"/><ellipse cx="450" cy="150" rx="45" ry="10"/>
+    <ellipse cx="207" cy="184" rx="45" ry="10"/><ellipse cx="393" cy="184" rx="45" ry="10"/>
+  </g>
+  <g fill="#1A301F" stroke="#7C9275" stroke-width="2">
+    <ellipse cx="200" cy="66" rx="12" ry="6"/><ellipse cx="400" cy="66" rx="12" ry="6"/>
+    <ellipse cx="150" cy="108" rx="12" ry="6"/><ellipse cx="450" cy="108" rx="12" ry="6"/>
+    <ellipse cx="150" cy="155" rx="12" ry="6"/><ellipse cx="450" cy="155" rx="12" ry="6"/>
+    <ellipse cx="207" cy="189" rx="12" ry="6"/><ellipse cx="393" cy="189" rx="12" ry="6"/>
+  </g>
+  <g class="showcase-rotor" stroke="#8B9F7F" stroke-width="4.5" stroke-linecap="round">
+    <path d="M159 61H240M359 61H440M109 103H190M409 103H490M109 150H190M409 150H490M166 184H247M352 184H433"/>
+  </g>
+  <g fill="#E5BD70" fill-opacity=".86"><circle cx="200" cy="61" r="3"/><circle cx="400" cy="61" r="3"/><circle cx="150" cy="103" r="3"/><circle cx="450" cy="103" r="3"/><circle cx="150" cy="150" r="3"/><circle cx="450" cy="150" r="3"/><circle cx="207" cy="184" r="3"/><circle cx="393" cy="184" r="3"/></g>
+  <path d="M272 151L256 204M328 151L344 204M246 207H280M320 207H354" stroke="#67815D" stroke-width="5" stroke-linecap="round"/>
+  <path d="M277 86H323L348 112V141L325 167H275L252 141V112L277 86Z" fill="url(#hero-heavy-shot-metal)" stroke="#90A282" stroke-width="2"/>
+  <path d="M277 86L290 97H311L323 86M252 112L269 115V139L252 141M348 112L331 115V139L348 141M275 167L285 152H315L325 167" stroke="#D5DDC9" stroke-opacity=".22" stroke-width="2"/>
+  <path d="M275 112L285 103H315L325 112V137L315 147H285L275 137V112Z" fill="#243D29" stroke="#6B865F" stroke-width="2"/>
+  <path d="M289 112H311M289 119H311M289 126H311" stroke="#AAB89C" stroke-opacity=".4" stroke-width="2" stroke-linecap="round"/>
+  <path d="M290 138H310" stroke="#E5BD70" stroke-width="3" stroke-linecap="round"/>
+  <path d="M260 116V134M340 116V134M283 158H317" stroke="#E5BD70" stroke-opacity=".58" stroke-width="2" stroke-linecap="round"/>
+  <path d="M300 86V71" stroke="#8EA382" stroke-width="2" stroke-linecap="round"/>
+  <g fill="#A0B191"><circle cx="276" cy="103" r="2"/><circle cx="324" cy="103" r="2"/><circle cx="275" cy="150" r="2"/><circle cx="325" cy="150" r="2"/></g>
+  <path d="M147 237H184M416 237H453" stroke="#E5BD70" stroke-opacity=".36" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div><figcaption><span>Повітряна платформа</span><strong>HEAVY SHOT</strong></figcaption></figure><figure class="equipment-slide" data-equipment="nrk" hidden><div class="equipment-stage"><svg aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="600" height="260" viewBox="0 0 600 260" fill="none">
+  <defs>
+    <radialGradient id="hero-nrk-halo"><stop stop-color="#66836D" stop-opacity=".18"/><stop offset="1" stop-color="#66836D" stop-opacity="0"/></radialGradient>
+    <linearGradient id="hero-nrk-metal" x1="233" y1="94" x2="343" y2="176" gradientUnits="userSpaceOnUse"><stop stop-color="#617266"/><stop offset=".5" stop-color="#33483C"/><stop offset="1" stop-color="#1B2D23"/></linearGradient>
+    <linearGradient id="hero-nrk-edge" x1="210" y1="140" x2="413" y2="191" gradientUnits="userSpaceOnUse"><stop stop-color="#E5BD70" stop-opacity=".8"/><stop offset="1" stop-color="#E5BD70" stop-opacity=".2"/></linearGradient>
+    <linearGradient id="hero-nrk-tire" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#29372F"/><stop offset="1" stop-color="#101C15"/></linearGradient>
+  </defs>
+  <ellipse cx="302" cy="140" rx="248" ry="111" fill="url(#hero-nrk-halo)"/>
+  <ellipse cx="302" cy="218" rx="192" ry="14" fill="#07100B" fill-opacity=".52"/>
+  <path d="M107 218H493" stroke="#E5BD70" stroke-opacity=".14"/>
+  <path d="M88 69V52H105M495 52H512V69" stroke="#E5BD70" stroke-opacity=".28" stroke-width="1.5"/>
+  <path d="M199 174L359 180L416 158L261 151L199 174Z" fill="#101F17" stroke="#526555" stroke-width="2"/>
+  <g fill="url(#hero-nrk-tire)" stroke="#4C5C50" stroke-width="2.5">
+    <ellipse cx="242" cy="165" rx="25" ry="32"/>
+    <ellipse cx="389" cy="155" rx="25" ry="32"/>
+  </g>
+  <path d="M183 136L347 141L420 116L260 107L183 136Z" fill="url(#hero-nrk-metal)" stroke="#6E7E6F" stroke-width="2"/>
+  <path d="M183 136L347 141V186L183 176V136Z" fill="#2B4032" stroke="#617163" stroke-width="2"/>
+  <path d="M347 141L420 116V159L347 186V141Z" fill="#203327" stroke="#526555" stroke-width="2"/>
+  <path d="M190 142L340 147M355 147L412 126" stroke="url(#hero-nrk-edge)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M213 106L314 112L370 92L272 87L213 106Z" fill="#506457" stroke="#819081" stroke-width="2"/>
+  <path d="M213 106V140L314 146V112L213 106Z" fill="url(#hero-nrk-metal)" stroke="#617163" stroke-width="2"/>
+  <path d="M314 112L370 92V125L314 146V112Z" fill="#273D2E" stroke="#617163" stroke-width="2"/>
+  <path d="M235 108V141M285 111V144M328 108V140M354 99V130" stroke="#13251B" stroke-width="4"/>
+  <path d="M225 103L322 108L357 96" stroke="#C3CBBE" stroke-opacity=".25" stroke-width="2"/>
+  <path d="M252 92L275 94L286 90L264 88L252 92Z" fill="#E5BD70" fill-opacity=".54"/>
+  <path d="M388 120V77" stroke="#607661" stroke-width="4" stroke-linecap="round"/>
+  <path d="M378 72H396V86H378V72Z" fill="#21392A" stroke="#7F947E" stroke-width="2"/>
+  <rect x="383" y="76" width="8" height="5" rx="2" fill="#E5BD70" fill-opacity=".85"/>
+  <g fill="url(#hero-nrk-tire)" stroke="#596B5B" stroke-width="2.5">
+    <ellipse cx="196" cy="180" rx="27" ry="34"/>
+    <ellipse cx="330" cy="189" rx="28" ry="34"/>
+  </g>
+  <g stroke="#798976" stroke-opacity=".42" stroke-width="3">
+    <path d="M176 160L186 165M173 176L184 177M175 193L187 188M192 148L194 160M189 203L192 213M209 155L203 166M215 178L205 179M211 199L204 190"/>
+    <path d="M310 169L320 174M307 187L318 188M311 204L321 199M327 158L328 170M324 215L327 225M344 166L338 176M352 188L342 189M346 208L339 199"/>
+  </g>
+  <g fill="#273D2D" stroke="#8C9B86" stroke-width="2">
+    <ellipse cx="196" cy="181" rx="12" ry="16"/>
+    <ellipse cx="330" cy="190" rx="12" ry="16"/>
+  </g>
+  <g fill="#E5BD70" fill-opacity=".68"><ellipse cx="196" cy="181" rx="3" ry="4"/><ellipse cx="330" cy="190" rx="3" ry="4"/></g>
+  <rect x="232" y="156" width="41" height="7" rx="2" fill="#10261A"/>
+  <rect x="190" y="148" width="12" height="5" rx="2" fill="#E5BD70" fill-opacity=".85"/>
+  <path d="M373 155L402 145M371 162L401 152" stroke="#789071" stroke-opacity=".6" stroke-width="2"/>
+  <circle cx="286" cy="160" r="2" fill="#A7B29F"/><circle cx="302" cy="161" r="2" fill="#A7B29F"/>
+  <path d="M147 233H184M416 233H453" stroke="#E5BD70" stroke-opacity=".36" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</div><figcaption><span>Наземна платформа</span><strong>НРК</strong></figcaption></figure></div><div class="showcase-controls" aria-label="Обрати техніку"><button type="button" data-showcase-index="0" aria-pressed="true">Вампір</button><button type="button" data-showcase-index="1" aria-pressed="false">HEAVY SHOT</button><button type="button" data-showcase-index="2" aria-pressed="false">НРК</button></div></section></section><div class="section-title-row"><h2 class="section-heading">Зведення журналу</h2><span>Дані спільного простору</span></div>
     <section class="stats content-anchor" id="overview" aria-label="Зведення">
       <div class="stat"><span>Усього рейсів</span><strong id="totalStat">0</strong></div>
       <div class="stat"><span>За вибраний період</span><strong id="periodStat">0</strong></div>
@@ -539,5 +676,6 @@
   <script src="assets/map-workspace.js?v=20261023"></script>
   <script src="assets/site-assistant.js?v=free-20261023"></script>
   <script src="assets/depth-motion.js?v=20261023"></script>
+  <script src="assets/equipment-showcase.js?v=20261023"></script>
 </body>
 </html>

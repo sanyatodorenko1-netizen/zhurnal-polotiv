@@ -26,7 +26,14 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await page.goto('http://127.0.0.1:'+server.address().port);
   assert(await page.locator('#assistantNav').isHidden());
   await page.locator('#loginEmail').fill('demo@example.test');await page.locator('#loginPassword').fill('fixture-only');await page.locator('#loginForm button[type=submit]').click();
-  await page.waitForSelector('#assistantNav:not([hidden])');await page.locator('#assistantNav').click();
+  await page.waitForSelector('#assistantNav:not([hidden])');
+  for(const [i,name] of ['Вампір','HEAVY SHOT','НРК'].entries()){
+    await page.locator('[data-showcase-index="'+i+'"]').click();
+    assert.equal(await page.locator('.equipment-slide:not([hidden]) figcaption strong').textContent(),name);
+    assert.equal(await page.locator('[data-showcase-index="'+i+'"]').getAttribute('aria-pressed'),'true');
+  }
+  for(const width of [360,768,1440]){await page.setViewportSize({width,height:1000});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'showcase overflow '+width);}
+  await page.locator('#assistantNav').click();
   assert(await page.locator('#assistantSend').isEnabled());
   await page.locator('.assistant-help-card').filter({hasText:'Як завантажити звіт'}).click();
   assert((await page.locator('#assistantGuideBody').textContent()).includes('обидва дні'));
