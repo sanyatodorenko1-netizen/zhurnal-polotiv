@@ -18,3 +18,6 @@ jobs:
       - run: node tests/dark-admin-archive.cjs
         env:
           PLAYWRIGHT_CHANNEL: chromium
+      - run: node tests/map-mgrs.cjs
+        env:
+          PLAYWRIGHT_CHANNEL: chromium
