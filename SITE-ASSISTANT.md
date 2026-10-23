@@ -1,3 +1,7 @@
+# Published mode: free assistant
+
+Local help, local form checks, Supabase feedback and explicit Google/DuckDuckGo links. No paid AI calls or connection checks. Only the typed query is sent when a provider link is clicked. Optional backend below remains inactive in the UI.
+
 # Site assistant
 
 Four separate capabilities are provided:
