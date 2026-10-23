@@ -1,0 +1,2 @@
+[functions.site-assistant]
+verify_jwt = true
