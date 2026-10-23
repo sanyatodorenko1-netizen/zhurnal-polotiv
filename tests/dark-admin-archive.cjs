@@ -46,6 +46,7 @@ const server = http.createServer((req,res)=>{
     for(const width of [360,768,1440]){
       await page.setViewportSize({width,height:960});
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'login overflow '+width);
+      if(width===360 && process.env.QA_SCREENSHOT_DIR){fs.mkdirSync(process.env.QA_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.QA_SCREENSHOT_DIR,'login-mobile.png'),fullPage:true});}
     }
     if(process.env.QA_SCREENSHOT_DIR){fs.mkdirSync(process.env.QA_SCREENSHOT_DIR,{recursive:true});await page.screenshot({path:path.join(process.env.QA_SCREENSHOT_DIR,'login-desktop.png'),fullPage:true});}
     await page.locator('#loginEmail').fill('admin@example.test');await page.locator('#loginPassword').fill('fixture-only');

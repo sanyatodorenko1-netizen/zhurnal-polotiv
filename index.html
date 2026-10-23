@@ -34,7 +34,7 @@
     @media(max-width:420px){body.auth-gate .welcome-copy{min-height:490px;padding:18px}body.auth-gate .welcome-brand{padding-bottom:90px}}
   </style>
   <link rel="stylesheet" href="assets/design-refresh.css?v=dashboard-20261011">
-  <link rel="stylesheet" href="assets/dark-green.css?v=studio-20261023">
+  <link rel="stylesheet" href="assets/dark-green.css?v=refined-20261023">
 </head>
 <body>
   <div class="app-frame">
@@ -60,7 +60,7 @@
     </header>
     <section class="panel sync-box" id="syncPanel">
       <div class="welcome-layout">
-        <div class="welcome-copy"><div class="welcome-brand"><div class="brand-mark" aria-hidden="true">Ж</div><div><strong>Журнал польотів</strong><small>Спільний робочий простір</small></div></div><div class="welcome-eyebrow">Єдиний журнал команди</div><h1>Одна команда.<br><em>Єдиний простір.</em></h1><div class="welcome-art" aria-hidden="true"><img src="assets/journal-emblem.svg" alt=""></div><p>Увійдіть, щоб переглядати записи, статистику та робочі точки, синхронізовані для вашої команди.</p><div class="welcome-features"><span><b>✓</b> Спільні записи</span><span><b>✓</b> Статистика команди</span><span><b>✓</b> Доступ за ролями</span></div></div>
+        <div class="welcome-copy"><div class="welcome-brand"><div class="brand-mark" aria-hidden="true">Ж</div><div><strong>Журнал польотів</strong><small>Спільний робочий простір</small></div></div><div class="welcome-eyebrow">Єдиний журнал команди</div><h1>Спільна робота.<br><em>Чіткий порядок.</em></h1><div class="welcome-art" aria-hidden="true"><img src="assets/premium-orbit.svg" alt=""></div><p>Увійдіть, щоб переглядати записи, статистику та робочі точки, синхронізовані для вашої команди.</p><div class="welcome-features"><span><b>✓</b> Спільні записи</span><span><b>✓</b> Статистика команди</span><span><b>✓</b> Доступ за ролями</span></div></div>
         <div class="welcome-card">
           <div id="setupMessage"><h2>Налаштування бази</h2><p>Щоб увімкнути спільний доступ, адміністратор має налаштувати підключення Supabase.</p></div>
           <form id="loginForm" hidden><h2>Вхід до журналу</h2><p>Введіть дані облікового запису.</p><div class="sync-row"><div><label for="loginEmail">Електронна пошта</label><input id="loginEmail" type="email" autocomplete="username" placeholder="name@example.com" required></div><div><label for="loginPassword">Пароль</label><input id="loginPassword" type="password" autocomplete="current-password" placeholder="Ваш пароль" required></div><button class="btn primary" type="submit">Увійти до журналу</button><button class="btn" type="button" id="forgotPasswordBtn">Забули пароль?</button></div></form>
@@ -82,7 +82,7 @@
   </div>
 </section>
 <section class="page-view" id="overviewView" aria-label="Огляд">
-    <section class="overview-hero" aria-labelledby="overviewHeroTitle"><div class="hero-copy"><p class="hero-kicker"><span></span> СПІЛЬНИЙ ЖУРНАЛ КОМАНДИ</p><h2 id="overviewHeroTitle">Усе важливе.<br><em>В одному просторі.</em></h2><p>Записи, техніка та звітність.<br>Злагоджена робота починається з порядку.</p><div class="hero-actions"><button class="btn primary" type="button" data-view="records">Відкрити журнал <span aria-hidden="true">↗</span></button><button class="hero-text-link" type="button" data-view="archive" id="heroArchiveLink" hidden>Архів зведень <span aria-hidden="true">→</span></button></div></div><div class="hero-art" aria-hidden="true"><img src="assets/journal-emblem.svg" alt=""><span class="art-label">ЗАПИСИ / СТРУКТУРА / ПОРЯДОК</span></div></section><div class="section-title-row"><h2 class="section-heading">Зведення журналу</h2><span>Дані спільного простору</span></div>
+    <section class="overview-hero" aria-labelledby="overviewHeroTitle"><div class="hero-copy"><p class="hero-kicker"><span></span> СПІЛЬНИЙ ЖУРНАЛ КОМАНДИ</p><h2 id="overviewHeroTitle">Ваш робочий простір.<br><em>Усе під контролем.</em></h2><p>Записи, техніка та звітність.<br>Злагоджена робота починається з порядку.</p><div class="hero-actions"><button class="btn primary" type="button" data-view="records">Відкрити журнал <span aria-hidden="true">↗</span></button><button class="hero-text-link" type="button" data-view="archive" id="heroArchiveLink" hidden>Архів зведень <span aria-hidden="true">→</span></button></div></div><div class="hero-art" aria-hidden="true"><img src="assets/premium-orbit.svg" alt=""><span class="art-label">ЗАПИСИ / СТРУКТУРА / ПОРЯДОК</span></div></section><div class="section-title-row"><h2 class="section-heading">Зведення журналу</h2><span>Дані спільного простору</span></div>
     <section class="stats content-anchor" id="overview" aria-label="Зведення">
       <div class="stat"><span>Усього рейсів</span><strong id="totalStat">0</strong></div>
       <div class="stat"><span>За вибраний період</span><strong id="periodStat">0</strong></div>
