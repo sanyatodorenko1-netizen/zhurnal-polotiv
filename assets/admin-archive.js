@@ -83,6 +83,7 @@
   }
   function sync() {
     el('archiveNav').hidden = !allowed();
+    el('heroArchiveLink').hidden = !allowed();
     if (!allowed()) { clear(); el('archiveRefresh').disabled = false; return; }
     load();
   }

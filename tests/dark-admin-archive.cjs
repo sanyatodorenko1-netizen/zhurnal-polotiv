@@ -24,7 +24,7 @@ const server = http.createServer((req,res)=>{
   const file = path.resolve(root, '.' + new URL(req.url,'http://localhost').pathname.replace(/\/$/,'/index.html'));
   if(!file.startsWith(root+path.sep)){res.writeHead(403).end();return;}
   fs.readFile(file,(error,data)=>{if(error){res.writeHead(404).end();return;}
-    res.setHeader('Content-Type',file.endsWith('.css')?'text/css':file.endsWith('.js')?'text/javascript':'text/html');res.end(data);});
+    res.setHeader('Content-Type',file.endsWith('.css')?'text/css':file.endsWith('.js')?'text/javascript':file.endsWith('.svg')?'image/svg+xml':file.endsWith('.png')?'image/png':'text/html');res.end(data);});
 });
 (async()=>{
   await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -42,6 +42,7 @@ const server = http.createServer((req,res)=>{
     });
     await page.goto('http://127.0.0.1:'+server.address().port);
     await page.waitForSelector('#loginForm:not([hidden])');
+    await page.waitForFunction(()=>[...document.querySelectorAll('.welcome-art img')].every(img=>img.complete && img.naturalWidth>0));
     for(const width of [360,768,1440]){
       await page.setViewportSize({width,height:960});
       assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'login overflow '+width);
@@ -60,8 +61,12 @@ const server = http.createServer((req,res)=>{
     }
     const out=process.env.QA_SCREENSHOT_DIR;
     if(out){fs.mkdirSync(out,{recursive:true});await page.screenshot({path:path.join(out,'admin-archive-desktop.png'),fullPage:true});}
-    await page.locator('[data-view=records]').click();
-    await page.locator('[data-view=overview]').click();
+    await page.locator('.side-nav [data-view=records]').click();
+    await page.locator('.side-nav [data-view=overview]').click();
+    if(out)await page.screenshot({path:path.join(out,'dashboard-desktop.png'),fullPage:true});
+    await page.locator('.hero-actions [data-view=records]').click();
+    assert(await page.locator('#recordsView').isVisible());
+    await page.locator('.side-nav [data-view=overview]').click();
     await page.setViewportSize({width:360,height:960});
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'overview overflow');
     if(out)await page.screenshot({path:path.join(out,'dashboard-mobile.png'),fullPage:true});
