@@ -490,7 +490,7 @@
     }
     async function loadEquipment(){
       if(equipmentLoading||!cloudEnabled||!currentUser||!currentRole)return;equipmentLoading=true;const uid=currentUser.id;
-      try{const {data,error}=await cloud.from('flight_equipment').select('id,platform_kind,board_number,model,status,notes,updated_at');if(currentUser?.id!==uid||!currentRole)return;if(error)throw error;equipmentRows=data||[];equipmentReady=true;$('equipmentNotice').textContent='Спільні дані техніки. Оновлюються автоматично кожні 10 секунд.';renderEquipment();refreshDirectoryChoices();}
+      try{const {data,error}=await cloud.from('flight_equipment').select('id,platform_kind,board_number,model,status,notes,updated_at');if(currentUser?.id!==uid||!currentRole)return;if(error)throw error;equipmentRows=data||[];equipmentReady=true;$('equipmentNotice').textContent='Спільні дані техніки. Оновлюються автоматично кожні 10 секунд.';renderEquipment();refreshDirectoryChoices();renderBoardLinks();}
       catch(error){if(currentUser?.id!==uid||!currentRole)return;equipmentReady=false;$('equipmentNotice').textContent='Не вдалося завантажити спільну техніку. Перевірте підключення та доступ у Supabase.';renderEquipment();refreshBoardChoices();}finally{equipmentLoading=false;}
     }
     function newEquipment(){if($('equipmentSave').disabled)return;$('equipmentForm').reset();$('equipmentId').value='';$('equipmentKind').disabled=false;$('equipmentNumber').readOnly=false;$('equipmentFormTitle').textContent='Додати техніку';$('equipmentSaveStatus').textContent='';}
@@ -511,6 +511,7 @@
       $('boardLinkList').innerHTML=boardTerminalLinks.map(row=>'<div class="day-row"><div><strong>'+esc(row.board_number)+' → '+esc(row.starlink_number)+'</strong><small>'+esc(row.platform_kind)+'</small></div></div>').join('')||'<p class="note">Прив’язок ще немає.</p>';
     }
     let boardLinksLoading=false;
+    $('linkPlatform').onchange=renderBoardLinks;
     async function loadBoardLinks(){
       if(boardLinksLoading||!cloudEnabled||!currentUser||!currentRole)return;boardLinksLoading=true;const uid=currentUser.id;
       try{const {data,error}=await cloud.from('flight_board_terminals').select('platform_kind,board_number,starlink_number');if(currentUser?.id!==uid)return;if(error)throw error;boardTerminalLinks=data||[];boardLinksReady=true;$('boardLinkStatus').textContent='Спільні прив’язки завантажено.';renderBoardLinks();}

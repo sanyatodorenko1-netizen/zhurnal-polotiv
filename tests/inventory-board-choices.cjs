@@ -17,7 +17,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
  await page.evaluate(async()=>{await loadDirectories();for(const field of ['executor','starlinkNumber','cargoType','position','destination']){directoryRows.push({category:field,value:'REGISTERED-'+field});flights[0][field]='OLD-'+field;}refreshDirectoryChoices();});
  const directoryValues=field=>page.locator('#'+field+' option').evaluateAll(es=>es.map(e=>e.value).filter(Boolean));
  for(const field of ['executor','starlinkNumber']){await page.evaluate(field=>{document.getElementById('directoryCategory').value=field;renderDirectories();},field);assert.equal(await page.locator('#directoryItems strong').allTextContents().then(xs=>xs.join(',')),'REGISTERED-'+field,'directory view must list only registered entries');}
- assert.deepEqual(await directoryValues('linkTerminal'),['REGISTERED-starlinkNumber']);assert.deepEqual(await directoryValues('linkBoard'),['N-REGISTERED']);
+ assert.deepEqual(await directoryValues('linkTerminal'),['REGISTERED-starlinkNumber']);assert.deepEqual(await directoryValues('linkBoard'),['N-REGISTERED']);await page.locator('#linkPlatform').selectOption('Вампір',{force:true});assert.deepEqual(await directoryValues('linkBoard'),['V-AVAILABLE']);
  const values=()=>page.locator('#platformNumber option').evaluateAll(es=>es.map(e=>e.value).filter(Boolean));
  await page.locator('#addBtn').click();assert.deepEqual(await values(),['N-REGISTERED']);
  for(const field of ['executor','starlinkNumber'])assert.deepEqual(await directoryValues(field),['REGISTERED-'+field]);
@@ -48,4 +48,3 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
  assert.deepEqual(errors,[]);
  console.log('PASS: inventory choices and historical behavior; moderators/executors can add only; viewers remain read-only; updates remain admin-only; RLS migration role checks.');
  }finally{await browser.close();server.close();}})().catch(e=>{console.error(e);server.close();process.exitCode=1;});
-
