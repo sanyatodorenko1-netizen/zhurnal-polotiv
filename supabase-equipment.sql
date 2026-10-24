@@ -17,8 +17,9 @@ drop policy if exists "Assigned users read equipment" on public.flight_equipment
 create policy "Assigned users read equipment" on public.flight_equipment for select to authenticated
  using ((select public.current_flight_role()) in ('admin','moderator','executor','viewer'));
 drop policy if exists "Admins add equipment" on public.flight_equipment;
-create policy "Admins add equipment" on public.flight_equipment for insert to authenticated
- with check ((select public.current_flight_role()) = 'admin' and updated_by = (select auth.uid()));
+drop policy if exists "Assigned users add equipment" on public.flight_equipment;
+create policy "Assigned users add equipment" on public.flight_equipment for insert to authenticated
+ with check ((select public.current_flight_role()) in ('admin','moderator','executor') and updated_by = (select auth.uid()));
 drop policy if exists "Admins update equipment" on public.flight_equipment;
 create policy "Admins update equipment" on public.flight_equipment for update to authenticated
  using ((select public.current_flight_role()) = 'admin')
