@@ -491,7 +491,7 @@
     async function loadEquipment(){
       if(equipmentLoading||!cloudEnabled||!currentUser||!currentRole)return;equipmentLoading=true;const uid=currentUser.id;
       try{const {data,error}=await cloud.from('flight_equipment').select('id,platform_kind,board_number,model,status,notes,updated_at');if(currentUser?.id!==uid||!currentRole)return;if(error)throw error;equipmentRows=data||[];equipmentReady=true;$('equipmentNotice').textContent='Спільні дані техніки. Оновлюються автоматично кожні 10 секунд.';renderEquipment();refreshDirectoryChoices();renderBoardLinks();}
-      catch(error){if(currentUser?.id!==uid||!currentRole)return;equipmentReady=false;$('equipmentNotice').textContent='Не вдалося завантажити спільну техніку. Перевірте підключення та доступ у Supabase.';renderEquipment();refreshBoardChoices();}finally{equipmentLoading=false;}
+      catch(error){if(currentUser?.id!==uid||!currentRole)return;equipmentReady=false;$('equipmentNotice').textContent='Не вдалося завантажити спільну техніку. Перевірте підключення та доступ у Supabase.';renderEquipment();refreshBoardChoices();renderBoardLinks();}finally{equipmentLoading=false;}
     }
     function newEquipment(){if($('equipmentSave').disabled)return;$('equipmentForm').reset();$('equipmentId').value='';$('equipmentKind').disabled=false;$('equipmentNumber').readOnly=false;$('equipmentFormTitle').textContent='Додати техніку';$('equipmentSaveStatus').textContent='';}
     $('equipmentNew').onclick=newEquipment;
