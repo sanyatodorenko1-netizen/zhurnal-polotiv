@@ -47,7 +47,7 @@ window.maplibregl={
 };`;
 const authStub = `
 window.supabase={createClient:()=>({auth:{onAuthStateChange(){},getSession:async()=>({data:{session:{user:{id:'test-map-user',email:'map@example.test'}}}})},
- from:table=>{const q={};for(const key of ['select','eq','order'])q[key]=()=>q;q.maybeSingle=async()=>({data:{role:'admin'}});q.then=ok=>Promise.resolve({data:[],error:null}).then(ok);return q;},rpc:async()=>({error:{code:'PGRST202'}})})};`;
+ from:table=>{const q={};for(const key of ['select','eq','order'])q[key]=()=>q;q.maybeSingle=async()=>({data:{role:'admin'}});q.then=ok=>Promise.resolve({data:table==='flight_records'?(window.fixtureFlights||[]).map(data=>({id:data.id,data})):[],error:null}).then(ok);return q;},rpc:async()=>({error:{code:'PGRST202'}})})};`;
 const root = path.resolve(__dirname, '..');
 const server = http.createServer((req,res)=>{
  const file=path.resolve(root,'.'+new URL(req.url,'http://local').pathname.replace(/\/$/,'/index.html'));
@@ -107,11 +107,11 @@ const server = http.createServer((req,res)=>{
   assert.equal(await page.locator('#locationMGRS').inputValue(),'');assert(await page.locator('#copyCoordinatesBtn').isDisabled());
   await page.locator('#placeSearch').fill('Demo');await page.locator('#locationSearchBtn').click();
   await page.waitForFunction(()=>!!document.getElementById('locationMGRS').value);
-  await page.evaluate(()=>{flights=[{id:'test-old',date:'2026-10-23',task:'Інше',workCoordinates:'48.24949, 16.41450'},{id:'test-new',date:'2026-10-23',task:'Інше',workCoordinates:'33U XP 05004 44997'}];render();});
+  await page.evaluate(()=>{flights=[{id:'test-old',date:'2026-10-23',task:'Інше',workCoordinates:'48.24949, 16.41450'},{id:'test-new',date:'2026-10-23',task:'Інше',workCoordinates:'33U XP 05004 44997'}];window.fixtureFlights=flights;render();});
   assert.equal(await page.evaluate(()=>savedWorkMarkers.length),2);
   await page.locator('#savedPointsLayer').uncheck();assert.equal(await page.evaluate(()=>savedWorkMarkers.length),0);
   await page.locator('#savedPointsLayer').check();assert.equal(await page.evaluate(()=>savedWorkMarkers.length),2);
-  await page.evaluate(()=>{flights=[];render();});
+  await page.evaluate(()=>{flights=[];window.fixtureFlights=[];render();});
   await page.locator('#mapFullscreen').click();
   await page.waitForFunction(()=>!!document.fullscreenElement||document.getElementById('agroMapSection').classList.contains('map-expanded'));
   await page.locator('#mapFullscreen').click();

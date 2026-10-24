@@ -1,5 +1,5 @@
 -- Ролі журналу польотів. Виконайте один раз у Supabase SQL Editor.
--- Початкові користувачі отримують роль executor; початкового адміна призначаємо окремо.
+-- Нові користувачі очікують призначення ролі; початкового адміна додаємо окремо.
 
 create table if not exists public.flight_user_roles (
   user_id uuid primary key references auth.users(id) on delete cascade,
@@ -45,17 +45,12 @@ where created_by is null;
 
 alter table public.flight_records alter column created_by set not null;
 
--- Поточні облікові записи стають виконавцями, доки адміністратор не змінить роль.
+-- Bootstrap only the original owner. New accounts wait for admin approval.
+-- Rerunning setup does not approve pending users or change existing roles.
 insert into public.flight_user_roles (user_id, role)
-select id, 'executor' from auth.users
+select id, 'admin' from auth.users
+where lower(email) = lower('sanyatodorenko1@gmail.com')
 on conflict (user_id) do nothing;
-
--- Первинний адмін, якого вказав власник журналу.
-update public.flight_user_roles
-set role = 'admin'
-where user_id in (
-  select id from auth.users where lower(email) = lower('sanyatodorenko1@gmail.com')
-);
 
 revoke all on public.flight_records from anon, public;
 grant select, insert, update, delete on public.flight_records to authenticated;
