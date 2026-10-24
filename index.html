@@ -427,9 +427,12 @@
       Object.keys(directoryFields).forEach(field=>{
         if(field==='platformNumber'){refreshBoardChoices(record);return;}
         const current=record?String(record[field]||''):$(field).value;
-        const values=[...new Set([...directoryRows.filter(row=>row.category===field).map(row=>row.value),...flights.map(f=>String(f[field]||'')).filter(Boolean),current].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
-        $(field).innerHTML='<option value="">Оберіть зі списку</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');
-        $(field).value=current;
+        const existing=flights.find(f=>f.id===$('recordId').value);
+        const historical=String(existing?.[field]||'');
+        const registered=directoryReady?directoryRows.filter(row=>row.category===field).map(row=>String(row.value||'')):[];
+        const values=[...new Set([...registered,historical].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
+        $(field).innerHTML='<option value="">Оберіть зі списку</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+(value===historical&&!registered.includes(value)?' · зі збереженого рейсу':'')+'</option>').join('');
+        $(field).value=values.includes(current)?current:'';
       });
     }
     function renderDirectories(){
@@ -445,9 +448,9 @@
       try{
         const {data,error}=await cloud.from('flight_directory_items').select('id,category,value').order('value');
         if(currentUser?.id!==userId)return;
-        if(error){directoryReady=false;$('directoryStatus').textContent='Спільні довідники недоступні. Адміністратору потрібно виконати supabase-directories.sql у SQL Editor. Наявні значення з журналу залишаються доступними.';return;}
+        if(error){directoryReady=false;refreshDirectoryChoices();renderBoardLinks();$('directoryStatus').textContent='Спільні довідники недоступні. Перевірте підключення та доступ. Варіанти зі старих рейсів не додаються.';return;}
         directoryRows=data||[];directoryReady=true;$('directoryStatus').textContent='Спільні довідники завантажено.';renderDirectories();
-      }catch(error){directoryReady=false;$('directoryStatus').textContent='Не вдалося завантажити довідники. Перевірте підключення.';}finally{directoryLoading=false;}
+      }catch(error){directoryReady=false;refreshDirectoryChoices();renderBoardLinks();$('directoryStatus').textContent='Не вдалося завантажити довідники. Перевірте підключення.';}finally{directoryLoading=false;}
     }
     function updateAutomaticCount(record){
       const automatic=!record||record.countMode==='per-record';
@@ -496,11 +499,11 @@
     function applyBoardTerminal(){
       const link=boardTerminalLinks.find(row=>row.platform_kind===$('platformKind').value&&row.board_number===$('platformNumber').value);
       $('starlinkNumber').value='';
-      if(link){const select=$('starlinkNumber');if(![...select.options].some(option=>option.value===link.starlink_number)){const option=document.createElement('option');option.value=link.starlink_number;option.textContent=link.starlink_number;select.append(option);}select.value=link.starlink_number;$('terminalHint').textContent='Starlink підставлено за прив’язкою. За потреби можна змінити вручну.';}
+      if(link&&directoryReady&&directoryRows.some(row=>row.category==='starlinkNumber'&&row.value===link.starlink_number)){$('starlinkNumber').value=link.starlink_number;$('terminalHint').textContent='Starlink підставлено за прив’язкою. За потреби можна змінити вручну.';}
       else $('terminalHint').textContent=$('platformNumber').value?'Для цього борта немає прив’язки. Оберіть Starlink вручну.':'';
     }
     function renderBoardLinks(){
-      ['linkBoard','linkTerminal'].forEach((id,index)=>{const field=index?'starlinkNumber':'platformNumber',current=$(id).value;const values=[...new Set([...directoryRows.filter(r=>r.category===field).map(r=>r.value),...flights.map(r=>r[field]).filter(Boolean),...boardTerminalLinks.map(r=>index?r.starlink_number:r.board_number)].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));$(id).innerHTML='<option value="">'+(index?'Без прив’язки':'Оберіть борт')+'</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');$(id).value=current;});
+      ['linkBoard','linkTerminal'].forEach((id,index)=>{const current=$(id).value;const source=index?(directoryReady?directoryRows.filter(r=>r.category==='starlinkNumber').map(r=>r.value):[]):(equipmentReady?equipmentRows.filter(r=>r.platform_kind===$('linkPlatform').value&&r.status!=='lost').map(r=>r.board_number):[]);const values=[...new Set(source.filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));$(id).innerHTML='<option value="">'+(index?'Без прив’язки':'Оберіть борт')+'</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');$(id).value=values.includes(current)?current:'';});
       $('boardLinkList').innerHTML=boardTerminalLinks.map(row=>'<div class="day-row"><div><strong>'+esc(row.board_number)+' → '+esc(row.starlink_number)+'</strong><small>'+esc(row.platform_kind)+'</small></div></div>').join('')||'<p class="note">Прив’язок ще немає.</p>';
     }
     let boardLinksLoading=false;
