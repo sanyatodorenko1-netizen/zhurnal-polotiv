@@ -14,3 +14,7 @@ Validation: model readiness, wheel movement and pause, WebGL fallback, manual/au
 ## Aircraft models
 
 assets/aircraft-models.js builds two original visual approximations: Vampire with six red propellers and Heavy Shot with four propellers, matching the existing reference photos. Each model has separate fixed motor housings, arms, landing gear and rotating propeller groups. Adjacent rotors alternate direction for the decorative animation. The shared viewer applies the same camera controls, pause, reduced motion, hidden-slide and WebGL fallback behavior. Animated GLB exports are assets/equipment/vampire-3d.glb and assets/equipment/heavy-shot-3d.glb. No engineering accuracy is claimed.
+
+## Detailed interactive viewer
+
+Rounded body edges, motor ribs, fasteners, panel seams, wiring, tire rings and stitched/wrinkled cargo fabric improve visual detail. The browser adds deterministic procedural micro-surface maps and a locally generated PMREM studio environment; no external texture service is used. Updated GLB files contain the detailed geometry and base materials; browser surface maps and studio lighting are viewer effects. A native dialog supports enlarged inspection, zoom buttons/mouse wheel, camera reset, Escape close and focus restoration. Automatic slide changes pause while the dialog is open. Mobile layout and WebGL fallback remain supported. Models remain approximations rather than photogrammetric replicas.

@@ -27,6 +27,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert(await page.locator('#assistantNav').isHidden());
   await page.locator('#loginEmail').fill('demo@example.test');await page.locator('#loginPassword').fill('fixture-only');await page.locator('#loginForm button[type=submit]').click();
   await page.waitForSelector('#assistantNav:not([hidden])');
+  await page.addStyleTag({content:'.equipment-slide{animation:none!important}'});
   for(const [i,kind] of ['vampire','heavy-shot'].entries()){
     await page.locator('[data-showcase-index="'+i+'"]').click();
     const selector='.equipment-slide[data-equipment="'+kind+'"] .equipment-stage';
@@ -49,9 +50,21 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').dataset.wheelAngle))>.1);
   await page.waitForFunction(()=>getComputedStyle(document.querySelector('.equipment-slide[data-equipment="nrk"]')).opacity==='1');
   await page.locator('.motion-toggle').click();
+  await page.locator('[data-showcase-index="2"]').click();
   await page.waitForTimeout(80);const stopped=await page.locator('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').getAttribute('data-wheel-angle');
   await page.waitForTimeout(200);assert.equal(await page.locator('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').getAttribute('data-wheel-angle'),stopped,'3D wheels must stop on pause');
   if(process.env.NRK_PREVIEW){await page.locator('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').screenshot({path:process.env.NRK_PREVIEW});}
+  await page.getByRole('button',{name:'Розгорнути 3D-модель НРК',exact:true}).click();
+  const studio=page.locator('dialog.model-dialog[open]');assert(await studio.isVisible());
+  await studio.getByRole('button',{name:'＋ Наблизити',exact:true}).click();
+  await page.waitForFunction(()=>document.querySelector('dialog[open] .nrk-3d-stage').dataset.cameraZoom==='0.88');
+  if(process.env.NRK_PREVIEW){await studio.screenshot({path:process.env.NRK_PREVIEW.replace('.png','-studio.png')});}
+  await page.setViewportSize({width:360,height:800});
+  assert(await studio.evaluate(e=>e.getBoundingClientRect().width<=innerWidth),'expanded 3D must fit mobile');
+  await page.setViewportSize({width:1440,height:1000});
+  await page.keyboard.press('Escape');assert.equal(await page.locator('dialog[open]').count(),0);
+  await page.waitForSelector('.equipment-slide[data-equipment="nrk"] canvas',{state:'attached'});
+  assert.equal(await page.locator('.equipment-slide[data-equipment="nrk"] canvas').count(),1);
   await page.locator('.motion-toggle').click();
   await page.locator('[data-showcase-index="0"]').click();
   await page.waitForFunction(()=>document.querySelector('.equipment-slide:not([hidden])').dataset.equipment==='heavy-shot',{},{timeout:7000});
