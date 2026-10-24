@@ -4,7 +4,7 @@ const root=path.resolve(__dirname,'..');
 const auth=`window.testRole='admin';let cb;window.fixtureFeedback=[];window.supabase={createClient:()=>({auth:{onAuthStateChange:f=>{cb=f;},getSession:async()=>({data:{session:window.fixtureSignedIn?{user:{id:'fixture',email:'demo@example.test'},access_token:'fixture-token'}:null}}),signInWithPassword:async()=>{window.fixtureSignedIn=true;cb('SIGNED_IN',{user:{id:'fixture',email:'demo@example.test'}});return {};},signOut:async()=>{window.fixtureSignedIn=false;cb('SIGNED_OUT',null);}},from:t=>{const q={};for(const k of ['select','eq','order','limit'])q[k]=()=>q;q.maybeSingle=async()=>({data:{role:window.testRole}});q.then=ok=>Promise.resolve({data:t==='site_feedback'?window.fixtureFeedback:[],error:null}).then(ok);return q;},rpc:async(name,p)=>{if(name==='submit_site_feedback'){window.fixtureFeedback.push({id:p.request_id,title:p.feedback_title,body:p.feedback_body,created_at:'2026-10-23T12:00:00Z'});return {data:p.request_id};}return {};}})};`;
 const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new URL(req.url,'http://test').pathname.replace(/\/$/,'/index.html'));if(!file.startsWith(root+path.sep))return res.writeHead(403).end();fs.readFile(file,(err,data)=>{if(err)return res.writeHead(404).end();res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':file.endsWith('.svg')?'image/svg+xml':file.endsWith('.png')?'image/png':'text/html');res.end(data);});});
 (async()=>{
- await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({channel:process.env.PLAYWRIGHT_CHANNEL||'chrome',headless:true});
+ await new Promise(r=>server.listen(0,'127.0.0.1',r));const browser=await chromium.launch({channel:process.env.PLAYWRIGHT_CHANNEL||'chrome',headless:true,args:['--enable-unsafe-swiftshader']});
  try{
   const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[],sent=[];let configured=false,delay=0,fail=false;
   page.on('pageerror',e=>errors.push(e.message));
@@ -32,10 +32,15 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
     assert.equal(await page.locator('.equipment-slide:not([hidden]) figcaption strong').textContent(),name);
     assert.equal(await page.locator('[data-showcase-index="'+i+'"]').getAttribute('aria-pressed'),'true');
   }
-  if(process.env.NRK_PREVIEW){await page.waitForFunction(()=>getComputedStyle(document.querySelector('.equipment-slide[data-equipment="nrk"]')).opacity==='1');await page.locator('.equipment-stage .nrk-motion').screenshot({path:process.env.NRK_PREVIEW});}
-  assert.equal(await page.locator('.equipment-stage img').count(),2);
-  assert.equal(await page.locator('.equipment-stage .nrk-wheel-turn').count(),3);
-  assert.equal(await page.locator('.equipment-stage .nrk-motion>svg>image').getAttribute('href'),'assets/equipment/nrk-user-platform.png');
+  await page.waitForSelector('.equipment-stage[data-model-state="ready"]');
+  assert.equal(await page.locator('.nrk-3d-stage canvas').count(),1);
+  await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.nrk-3d-stage').dataset.wheelAngle))>.1);
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.equipment-slide[data-equipment="nrk"]')).opacity==='1');
+  await page.locator('.motion-toggle').click();
+  await page.waitForTimeout(80);const stopped=await page.locator('.nrk-3d-stage').getAttribute('data-wheel-angle');
+  await page.waitForTimeout(200);assert.equal(await page.locator('.nrk-3d-stage').getAttribute('data-wheel-angle'),stopped,'3D wheels must stop on pause');
+  if(process.env.NRK_PREVIEW){await page.locator('.nrk-3d-stage').screenshot({path:process.env.NRK_PREVIEW});}
+  await page.locator('.motion-toggle').click();
   await page.locator('[data-showcase-index="0"]').click();
   await page.waitForFunction(()=>document.querySelector('.equipment-slide:not([hidden])').dataset.equipment==='heavy-shot',{},{timeout:7000});
   for(const width of [360,768,1440]){await page.setViewportSize({width,height:1000});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'showcase overflow '+width);}
@@ -63,9 +68,11 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert.equal(sent.length,0,'no paid AI calls');
   await page.locator('#signOutBtn').click();assert.equal(await page.locator('#feedbackList').textContent(),'');assert(await page.locator('#assistantNav').isHidden());
   await page.locator('.motion-toggle').click();assert(await page.locator('html').evaluate(e=>e.classList.contains('motion-paused')));
-  assert.equal(await page.locator('.equipment-stage .nrk-wheel-turn').first().evaluate(e=>getComputedStyle(e).animationPlayState),'paused');
   await page.reload();assert(await page.locator('html').evaluate(e=>e.classList.contains('motion-paused')));
   await page.emulateMedia({reducedMotion:'reduce'});assert(await page.locator('.motion-toggle').isHidden());
+  await page.addInitScript(()=>{const get=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type,...args){if(String(type).includes('webgl'))return null;return get.call(this,type,...args);};});
+  await page.reload();await page.waitForSelector('.equipment-stage[data-model-state="fallback"]',{state:'attached'});
+  assert.equal(await page.locator('.equipment-slide[data-equipment="nrk"] img').getAttribute('src'),'assets/equipment/nrk-user-platform.png');
   assert.deepEqual(errors,[]);
   console.log('PASS: free search URLs, private query guard, no paid AI calls, local help/forms, feedback, logout and mobile layouts.');
  }finally{await browser.close();server.close();}
