@@ -14,8 +14,15 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
  await page.goto('http://127.0.0.1:'+server.address().port);
  await page.locator('#loginEmail').fill('fixture@example.test');await page.locator('#loginPassword').fill('fixture');await page.locator('#loginForm button[type=submit]').click();
  await page.waitForFunction(()=>document.getElementById('equipmentNotice').textContent.includes('Оновлюються'));
+ await page.evaluate(async()=>{await loadDirectories();for(const field of ['executor','starlinkNumber','cargoType','position','destination']){directoryRows.push({category:field,value:'REGISTERED-'+field});flights[0][field]='OLD-'+field;}refreshDirectoryChoices();});
+ const directoryValues=field=>page.locator('#'+field+' option').evaluateAll(es=>es.map(e=>e.value).filter(Boolean));
+ for(const field of ['executor','starlinkNumber']){await page.evaluate(field=>{document.getElementById('directoryCategory').value=field;renderDirectories();},field);assert.equal(await page.locator('#directoryItems strong').allTextContents().then(xs=>xs.join(',')),'REGISTERED-'+field,'directory view must list only registered entries');}
+ assert.deepEqual(await directoryValues('linkTerminal'),['REGISTERED-starlinkNumber']);assert.deepEqual(await directoryValues('linkBoard'),['N-REGISTERED']);
  const values=()=>page.locator('#platformNumber option').evaluateAll(es=>es.map(e=>e.value).filter(Boolean));
  await page.locator('#addBtn').click();assert.deepEqual(await values(),['N-REGISTERED']);
+ for(const field of ['executor','starlinkNumber'])assert.deepEqual(await directoryValues(field),['REGISTERED-'+field]);
+ for(const field of ['cargoType','position','destination'])assert.deepEqual(await directoryValues(field),['OLD-'+field,'REGISTERED-'+field],'cargo and route history stays available');
+ await page.evaluate(()=>{boardTerminalLinks=[{platform_kind:'НРК',board_number:'N-REGISTERED',starlink_number:'UNREGISTERED-LINK'}];document.getElementById('platformNumber').value='N-REGISTERED';applyBoardTerminal();});assert.deepEqual(await directoryValues('starlinkNumber'),['REGISTERED-starlinkNumber']);assert.equal(await page.locator('#starlinkNumber').inputValue(),'');
  await page.locator('#platformKind').selectOption('Вампір');assert.deepEqual(await values(),['V-AVAILABLE']);
  await page.locator('#platformNumber').selectOption('V-AVAILABLE');
  await page.locator('#platformKind').selectOption('HEAVY SHOT');assert.deepEqual(await values(),['H-REGISTERED']);assert.equal(await page.locator('#platformNumber').inputValue(),'');
@@ -23,9 +30,12 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
  await page.locator('#platformKind').selectOption('Вампір');assert.deepEqual(await values(),['V-AVAILABLE','V-NEW']);
  await page.locator('#cancelBtn').click();await page.locator('.side-link[data-view="records"]').click();await page.locator('[data-edit="legacy-flight"]').click();
  assert.equal(await page.locator('#platformNumber').inputValue(),'HISTORIC-ONLY');assert((await values()).includes('HISTORIC-ONLY'));
+ for(const field of ['executor','starlinkNumber']){assert.equal(await page.locator('#'+field).inputValue(),'OLD-'+field);assert.deepEqual(await directoryValues(field),['OLD-'+field,'REGISTERED-'+field]);}
  assert((await page.locator('#platformNumber option:checked').textContent()).includes('зі збереженого рейсу'));
  await page.evaluate(async()=>{await loadEquipment();});assert.equal(await page.locator('#platformNumber').inputValue(),'HISTORIC-ONLY');
  await page.locator('#cancelBtn').click();await page.locator('[data-repeat="legacy-flight"]').click();assert.deepEqual(await values(),['V-AVAILABLE','V-NEW']);assert.equal(await page.locator('#platformNumber').inputValue(),'');
+ for(const field of ['executor','starlinkNumber']){assert.deepEqual(await directoryValues(field),['REGISTERED-'+field]);assert.equal(await page.locator('#'+field).inputValue(),'');}
+ await page.evaluate(()=>{directoryReady=false;refreshDirectoryChoices();});for(const field of ['executor','starlinkNumber'])assert.deepEqual(await directoryValues(field),[]);
  await page.evaluate(async()=>{window.inventoryFixture=[];await loadEquipment();});assert.deepEqual(await values(),[]);assert((await page.locator('#boardAvailabilityHint').textContent()).includes('немає наявної'));
  await page.evaluate(async()=>{window.inventoryFixture=[{id:'v',platform_kind:'Вампір',board_number:'V-AVAILABLE',status:'vp'}];await loadEquipment();window.inventoryError=true;await loadEquipment();});assert.deepEqual(await values(),[]);
  assert((await page.locator('#boardAvailabilityHint').textContent()).includes('не завантажено'));
@@ -38,3 +48,4 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
  assert.deepEqual(errors,[]);
  console.log('PASS: inventory choices and historical behavior; moderators/executors can add only; viewers remain read-only; updates remain admin-only; RLS migration role checks.');
  }finally{await browser.close();server.close();}})().catch(e=>{console.error(e);server.close();process.exitCode=1;});
+
