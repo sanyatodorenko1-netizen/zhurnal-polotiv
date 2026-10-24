@@ -27,19 +27,31 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert(await page.locator('#assistantNav').isHidden());
   await page.locator('#loginEmail').fill('demo@example.test');await page.locator('#loginPassword').fill('fixture-only');await page.locator('#loginForm button[type=submit]').click();
   await page.waitForSelector('#assistantNav:not([hidden])');
+  for(const [i,kind] of ['vampire','heavy-shot'].entries()){
+    await page.locator('[data-showcase-index="'+i+'"]').click();
+    const selector='.equipment-slide[data-equipment="'+kind+'"] .equipment-stage';
+    await page.waitForSelector(selector+'[data-model-state="ready"]');
+    await page.waitForFunction(sel=>Number(document.querySelector(sel).dataset.motionAngle)>0,selector);
+    await page.waitForFunction(sel=>getComputedStyle(document.querySelector(sel).closest('figure')).opacity==='1',selector);
+    await page.locator('.motion-toggle').click();await page.waitForTimeout(80);
+    const stopped=await page.locator(selector).getAttribute('data-motion-angle');await page.waitForTimeout(160);
+    assert.equal(await page.locator(selector).getAttribute('data-motion-angle'),stopped,'rotors must stop on pause');
+    if(process.env.AIRCRAFT_PREVIEW_DIR){await page.locator(selector).screenshot({path:path.join(process.env.AIRCRAFT_PREVIEW_DIR,kind+'-3d-preview.png')});}
+    await page.locator('.motion-toggle').click();
+  }
   for(const [i,name] of ['Вампір','HEAVY SHOT','НРК'].entries()){
     await page.locator('[data-showcase-index="'+i+'"]').click();
     assert.equal(await page.locator('.equipment-slide:not([hidden]) figcaption strong').textContent(),name);
     assert.equal(await page.locator('[data-showcase-index="'+i+'"]').getAttribute('aria-pressed'),'true');
   }
   await page.waitForSelector('.equipment-stage[data-model-state="ready"]');
-  assert.equal(await page.locator('.nrk-3d-stage canvas').count(),1);
-  await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.nrk-3d-stage').dataset.wheelAngle))>.1);
+  assert.equal(await page.locator('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage canvas').count(),1);
+  await page.waitForFunction(()=>Math.abs(Number(document.querySelector('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').dataset.wheelAngle))>.1);
   await page.waitForFunction(()=>getComputedStyle(document.querySelector('.equipment-slide[data-equipment="nrk"]')).opacity==='1');
   await page.locator('.motion-toggle').click();
-  await page.waitForTimeout(80);const stopped=await page.locator('.nrk-3d-stage').getAttribute('data-wheel-angle');
-  await page.waitForTimeout(200);assert.equal(await page.locator('.nrk-3d-stage').getAttribute('data-wheel-angle'),stopped,'3D wheels must stop on pause');
-  if(process.env.NRK_PREVIEW){await page.locator('.nrk-3d-stage').screenshot({path:process.env.NRK_PREVIEW});}
+  await page.waitForTimeout(80);const stopped=await page.locator('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').getAttribute('data-wheel-angle');
+  await page.waitForTimeout(200);assert.equal(await page.locator('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').getAttribute('data-wheel-angle'),stopped,'3D wheels must stop on pause');
+  if(process.env.NRK_PREVIEW){await page.locator('.equipment-slide[data-equipment="nrk"] .nrk-3d-stage').screenshot({path:process.env.NRK_PREVIEW});}
   await page.locator('.motion-toggle').click();
   await page.locator('[data-showcase-index="0"]').click();
   await page.waitForFunction(()=>document.querySelector('.equipment-slide:not([hidden])').dataset.equipment==='heavy-shot',{},{timeout:7000});
