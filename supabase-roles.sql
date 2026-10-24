@@ -1,5 +1,5 @@
 -- Ролі журналу польотів. Виконайте один раз у Supabase SQL Editor.
--- Початкові користувачі отримують роль executor; початкового адміна призначаємо окремо.
+-- Нові користувачі очікують призначення ролі; початкового адміна додаємо окремо.
 
 create table if not exists public.flight_user_roles (
   user_id uuid primary key references auth.users(id) on delete cascade,
