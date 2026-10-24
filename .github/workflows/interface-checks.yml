@@ -30,3 +30,6 @@ jobs:
       - run: node tests/inventory-board-choices.cjs
         env:
           PLAYWRIGHT_CHANNEL: chrome
+      - run: node tests/registration.cjs
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
