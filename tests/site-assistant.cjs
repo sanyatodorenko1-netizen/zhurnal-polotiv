@@ -32,6 +32,9 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
     assert.equal(await page.locator('.equipment-slide:not([hidden]) figcaption strong').textContent(),name);
     assert.equal(await page.locator('[data-showcase-index="'+i+'"]').getAttribute('aria-pressed'),'true');
   }
+  assert.equal(await page.locator('.equipment-stage img').count(),3);
+  await page.locator('[data-showcase-index="0"]').click();
+  await page.waitForFunction(()=>document.querySelector('.equipment-slide:not([hidden])').dataset.equipment==='heavy-shot',{},{timeout:7000});
   for(const width of [360,768,1440]){await page.setViewportSize({width,height:1000});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'showcase overflow '+width);}
   await page.locator('#assistantNav').click();
   assert(await page.locator('#assistantSend').isEnabled());
