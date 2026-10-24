@@ -20,7 +20,7 @@
       if(error)throw error;
       el('registrationPassword').value='';el('registrationConfirm').value='';
       el('registrationStatus').textContent='Якщо адресу можна зареєструвати, обліковий запис створено. Перевірте пошту для підтвердження email. Доступ до журналу надає адміністратор.';
-      if(data?.session){el('registrationDialog').close();await loadUserRole();}
+      if(data?.session)el('registrationDialog').close();
     }catch(error){el('registrationStatus').textContent='Не вдалося зареєструватися: '+(error.message||'Перевірте підключення.');}
     finally{el('registrationSubmit').disabled=false;}
   };
