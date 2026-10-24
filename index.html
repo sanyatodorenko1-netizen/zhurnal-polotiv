@@ -166,7 +166,7 @@
       <div><label for="platformKind">Платформа *</label><select id="platformKind" required><option>НРК</option><option>Вампір</option><option>HEAVY SHOT</option></select></div>
       <div><label for="task">Тип завдання *</label><select id="task" required><option>Доставка</option><option>Бомбардування</option></select></div>
       <div><label for="aircraft">Тип / модель борта</label><input id="aircraft" placeholder="За потреби: модель або уточнення"></div>
-      <div><label for="platformNumber">Номер борта / НРК</label><select id="platformNumber"><option value="">Оберіть зі списку</option></select></div>
+      <div><label for="platformNumber">Номер борта / НРК</label><select id="platformNumber" aria-describedby="boardAvailabilityHint"><option value="">Оберіть зі списку</option></select><p id="boardAvailabilityHint" class="note" role="status"></p></div>
       <div><label for="starlinkNumber">Номер термінала Starlink</label><select id="starlinkNumber"><option value="">Оберіть зі списку</option></select><p id="terminalHint" class="note" role="status"></p></div>
       <div><label for="executor">Виконавець місії</label><select id="executor"><option value="">Оберіть зі списку</option></select></div>
       <div class="wide"><p id="boardCountHint" class="note" role="status"></p></div><div><label for="ePoints">Є-бали</label><input id="ePoints" type="text" inputmode="decimal" value="0" pattern="[0-9]+([.,][0-9]+)?" placeholder="Наприклад, 1,5 або 2,25" title="Невід’ємне число, наприклад 1,5"></div>
@@ -382,7 +382,7 @@
     function updateTaskChoices(selected='Доставка',legacy=''){const options=['Доставка'];if(isAirPlatform($('platformKind').value))options.push('Бомбардування');else options.push('Медична евакуація');if(legacy&&!options.includes(legacy))options.push(legacy);$('task').innerHTML=options.map(v=>`<option>${esc(v)}</option>`).join('');$('task').value=options.includes(selected)?selected:'Доставка';updateTaskFields();}
     function resetForm(){ $('formSaveStatus').textContent='';$('flightForm').reset();$('autoEvacPoints').checked=true;$('evacDistanceBand').value='';$('recordId').value='';$('date').value=new Date().toISOString().slice(0,10);$('platformKind').value='НРК';updateTaskChoices('Доставка');$('weight').value='0';$('ePoints').value='0';$('bombCount').value='0';$('bombWeight').value='0';$('aircraftCount').value='1';$('nrkTrips').value='0';$('plannedWeight').value='0';$('cargoDelivered').value='false';$('returnedToBase').value='false';$('incidents').value='0';$('formTitle').textContent='Новий рейс'; }
     function openForm(f){resetForm();if(f){$('formTitle').textContent='Змінити рейс';const kind=f.platformKind||(f.task==='Місія «Вампір»'||String(f.aircraft||'').toLowerCase().includes('вамп')?'Вампір':'НРК');$('platformKind').value=kind;const selected=f.task||'Доставка';updateTaskChoices(selected,f.task==='Місія НРК'||f.task==='Місія «Вампір»'?f.task:'');for(const k of ['id','date','startTime','aircraft','platformNumber','starlinkNumber','executor','cargoType','weight','ePoints','bombType','bombCount','bombWeight','bombsUsed','bombsFailed','targetsHit','vampireFlights','packagesDelivered','nrkSuccessfulMissions','nrkFailedMissions','bombCoordinates','aircraftCount','nrkTrips','plannedWeight','cargoDelivered','returnedToBase','position','destination','coordinates','workCoordinates','incidents','notes'])$(k==='id'?'recordId':k).value=f[k]??'';document.querySelectorAll('[name="impactResults"]').forEach(el=>el.checked=(f.impactResults||[]).includes(el.value));} if(f){$('autoEvacPoints').checked=f.ePointsCalculation?.method==='nrk-evacuation';$('evacDistanceBand').value=f.ePointsCalculation?.distanceBand||'';}updateEvacPoints();refreshDirectoryChoices(f);updateAutomaticCount(f);$('terminalHint').textContent='';$('editor').showModal()}$('addBtn').onclick=$('emptyAddBtn').onclick=()=>openForm();$('closeBtn').onclick=$('cancelBtn').onclick=()=>$('editor').close();
-    $('monthFilter').onchange=render;$('taskFilter').onchange=render;$('platformKind').onchange=()=>{updateTaskChoices('Доставка');updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));applyBoardTerminal();};$('platformNumber').onchange=()=>{updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));applyBoardTerminal();};$('task').onchange=updateTaskFields;
+    $('monthFilter').onchange=render;$('taskFilter').onchange=render;$('platformKind').onchange=()=>{updateTaskChoices('Доставка');refreshBoardChoices();updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));applyBoardTerminal();};$('platformNumber').onchange=()=>{updateAutomaticCount(flights.find(f=>f.id===$('recordId').value));applyBoardTerminal();};$('task').onchange=updateTaskFields;
     function showView(name){if((name==='roles'||name==='archive')&&currentRole!=='admin')name='overview';activeView=name;document.querySelector('.dashboard-filters').hidden=name==='archive'||name==='assistant';document.querySelectorAll('.page-view').forEach(view=>view.hidden=view.id!==name+'View');document.querySelectorAll('[data-view]').forEach(button=>{button.classList.toggle('active',button.dataset.view===name);if(button.dataset.view===name)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');});if(name==='equipment'||name==='overview')loadEquipment();if(name==='directories'){loadDirectories();loadBoardLinks();}if(name==='map'){initializeWorldMap();if(agroMap)setTimeout(()=>agroMap.resize(),120);}}
     document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
     showView('overview');
@@ -409,10 +409,24 @@
       if(cloudEnabled&&!currentUser){directoryRows=[];directoryReady=false;boardTerminalLinks=[];boardLinksReady=false;equipmentRows=[];equipmentReady=false;}
       if(cloudEnabled&&!currentRole){equipmentRows=[];equipmentReady=false;$('equipmentNotice').textContent='';renderEquipment();}
     }
+    function refreshBoardChoices(record){
+      const select=$('platformNumber'),kind=$('platformKind').value;
+      const current=record?String(record.platformNumber||''):select.value;
+      const existing=flights.find(f=>f.id===$('recordId').value);
+      const historical=existing&&platformOf(existing)===kind?String(existing.platformNumber||''):'';
+      const inventory=equipmentReady?equipmentRows.filter(row=>row.platform_kind===kind&&row.status!=='lost').map(row=>String(row.board_number||'')).filter(Boolean):[];
+      const values=[...new Set([...inventory,historical].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
+      select.innerHTML='<option value="">Оберіть зі списку</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+(value===historical&&!inventory.includes(value)?' · зі збереженого рейсу':'')+'</option>').join('');
+      select.value=values.includes(current)?current:'';
+      $('boardAvailabilityHint').textContent=!equipmentReady?'Список техніки ще не завантажено. Перевірте підключення.':inventory.length?'Лише наявна техніка обраної платформи з розділу «Облік техніки».':'Для цієї платформи немає наявної техніки. Адміністратор має додати борт у «Облік техніки».';
+      if(historical&&!inventory.includes(historical))$('boardAvailabilityHint').textContent+=' Попередній номер цього рейсу збережено для редагування.';
+      if(current&&!select.value){applyBoardTerminal();updateAutomaticCount(existing);}
+    }
     function refreshDirectoryChoices(record){
       Object.keys(directoryFields).forEach(field=>{
+        if(field==='platformNumber'){refreshBoardChoices(record);return;}
         const current=record?String(record[field]||''):$(field).value;
-        const values=[...new Set([...directoryRows.filter(row=>row.category===field).map(row=>row.value),...flights.map(f=>String(f[field]||'')).filter(Boolean),...(field==='platformNumber'?equipmentRows.map(row=>row.board_number):[]),current].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
+        const values=[...new Set([...directoryRows.filter(row=>row.category===field).map(row=>row.value),...flights.map(f=>String(f[field]||'')).filter(Boolean),current].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
         $(field).innerHTML='<option value="">Оберіть зі списку</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');
         $(field).value=current;
       });
@@ -469,7 +483,7 @@
     async function loadEquipment(){
       if(equipmentLoading||!cloudEnabled||!currentUser||!currentRole)return;equipmentLoading=true;const uid=currentUser.id;
       try{const {data,error}=await cloud.from('flight_equipment').select('id,platform_kind,board_number,model,status,notes,updated_at');if(currentUser?.id!==uid||!currentRole)return;if(error)throw error;equipmentRows=data||[];equipmentReady=true;$('equipmentNotice').textContent='Спільні дані техніки. Оновлюються автоматично кожні 10 секунд.';renderEquipment();refreshDirectoryChoices();}
-      catch(error){if(currentUser?.id!==uid||!currentRole)return;equipmentReady=false;$('equipmentNotice').textContent='Не вдалося завантажити спільну техніку. Перевірте підключення та доступ у Supabase.';renderEquipment();}finally{equipmentLoading=false;}
+      catch(error){if(currentUser?.id!==uid||!currentRole)return;equipmentReady=false;$('equipmentNotice').textContent='Не вдалося завантажити спільну техніку. Перевірте підключення та доступ у Supabase.';renderEquipment();refreshBoardChoices();}finally{equipmentLoading=false;}
     }
     function newEquipment(){if($('equipmentSave').disabled)return;$('equipmentForm').reset();$('equipmentId').value='';$('equipmentKind').disabled=false;$('equipmentNumber').readOnly=false;$('equipmentFormTitle').textContent='Додати техніку';$('equipmentSaveStatus').textContent='';}
     $('equipmentNew').onclick=newEquipment;
