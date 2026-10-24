@@ -427,6 +427,10 @@
       Object.keys(directoryFields).forEach(field=>{
         if(field==='platformNumber'){refreshBoardChoices(record);return;}
         const current=record?String(record[field]||''):$(field).value;
+        if(!['executor','starlinkNumber'].includes(field)){
+          const values=[...new Set([...directoryRows.filter(row=>row.category===field).map(row=>row.value),...flights.map(f=>String(f[field]||'')).filter(Boolean),current].filter(Boolean))].sort((a,b)=>a.localeCompare(b,'uk'));
+          $(field).innerHTML='<option value="">Оберіть зі списку</option>'+values.map(value=>'<option value="'+esc(value)+'">'+esc(value)+'</option>').join('');$(field).value=current;return;
+        }
         const existing=flights.find(f=>f.id===$('recordId').value);
         const historical=String(existing?.[field]||'');
         const registered=directoryReady?directoryRows.filter(row=>row.category===field).map(row=>String(row.value||'')):[];
