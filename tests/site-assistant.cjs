@@ -63,6 +63,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert(await studio.evaluate(e=>e.getBoundingClientRect().width<=innerWidth),'expanded 3D must fit mobile');
   await page.setViewportSize({width:1440,height:1000});
   await page.keyboard.press('Escape');assert.equal(await page.locator('dialog[open]').count(),0);
+  await page.waitForSelector('.equipment-slide[data-equipment="nrk"] canvas',{state:'attached'});
   assert.equal(await page.locator('.equipment-slide[data-equipment="nrk"] canvas').count(),1);
   await page.locator('.motion-toggle').click();
   await page.locator('[data-showcase-index="0"]').click();
