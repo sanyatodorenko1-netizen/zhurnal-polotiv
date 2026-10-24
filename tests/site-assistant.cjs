@@ -32,7 +32,10 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
     assert.equal(await page.locator('.equipment-slide:not([hidden]) figcaption strong').textContent(),name);
     assert.equal(await page.locator('[data-showcase-index="'+i+'"]').getAttribute('aria-pressed'),'true');
   }
-  assert.equal(await page.locator('.equipment-stage img').count(),3);
+  if(process.env.NRK_PREVIEW){await page.waitForFunction(()=>getComputedStyle(document.querySelector('.equipment-slide[data-equipment="nrk"]')).opacity==='1');await page.locator('.equipment-stage .nrk-motion').screenshot({path:process.env.NRK_PREVIEW});}
+  assert.equal(await page.locator('.equipment-stage img').count(),2);
+  assert.equal(await page.locator('.equipment-stage .nrk-wheel-turn').count(),3);
+  assert.equal(await page.locator('.equipment-stage .nrk-motion>svg>image').getAttribute('href'),'assets/equipment/nrk-user-platform.png');
   await page.locator('[data-showcase-index="0"]').click();
   await page.waitForFunction(()=>document.querySelector('.equipment-slide:not([hidden])').dataset.equipment==='heavy-shot',{},{timeout:7000});
   for(const width of [360,768,1440]){await page.setViewportSize({width,height:1000});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'showcase overflow '+width);}
@@ -60,6 +63,7 @@ const server=http.createServer((req,res)=>{const file=path.resolve(root,'.'+new 
   assert.equal(sent.length,0,'no paid AI calls');
   await page.locator('#signOutBtn').click();assert.equal(await page.locator('#feedbackList').textContent(),'');assert(await page.locator('#assistantNav').isHidden());
   await page.locator('.motion-toggle').click();assert(await page.locator('html').evaluate(e=>e.classList.contains('motion-paused')));
+  assert.equal(await page.locator('.equipment-stage .nrk-wheel-turn').first().evaluate(e=>getComputedStyle(e).animationPlayState),'paused');
   await page.reload();assert(await page.locator('html').evaluate(e=>e.classList.contains('motion-paused')));
   await page.emulateMedia({reducedMotion:'reduce'});assert(await page.locator('.motion-toggle').isHidden());
   assert.deepEqual(errors,[]);

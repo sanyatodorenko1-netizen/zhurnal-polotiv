@@ -37,6 +37,7 @@
   <link rel="stylesheet" href="assets/dark-green.css?v=assistant-20261023">
   <link rel="stylesheet" href="assets/depth-motion.css?v=20261023">
   <link rel="stylesheet" href="assets/equipment-showcase.css?v=photo-20261024">
+  <link rel="stylesheet" href="assets/nrk-wheels.css?v=20261024">
 </head>
 <body>
   <div class="app-frame">
@@ -93,7 +94,7 @@
   </div>
 </section>
 <section class="page-view" id="overviewView" aria-label="Огляд">
-    <section class="overview-hero" aria-labelledby="overviewHeroTitle"><div class="hero-copy"><p class="hero-kicker"><span></span> СПІЛЬНИЙ ЖУРНАЛ КОМАНДИ</p><h2 id="overviewHeroTitle">Ваш робочий простір.<br><em>Усе під контролем.</em></h2><p>Записи, техніка та звітність.<br>Злагоджена робота починається з порядку.</p><div class="hero-actions"><button class="btn primary" type="button" data-view="records">Відкрити журнал <span aria-hidden="true">↗</span></button><button class="hero-text-link" type="button" data-view="archive" id="heroArchiveLink" hidden>Архів зведень <span aria-hidden="true">→</span></button></div></div><section class="equipment-showcase" aria-label="Техніка команди"><div class="showcase-caption">ТЕХНІКА КОМАНДИ <span aria-hidden="true">↗</span></div><div class="equipment-slides"><figure class="equipment-slide" data-equipment="vampire"><div class="equipment-stage"><img src="assets/equipment/vampire-photo.png" alt="Фото Вампір" width="960" height="540" decoding="async"></div><figcaption><span>Повітряна платформа</span><strong>Вампір</strong></figcaption></figure><figure class="equipment-slide" data-equipment="heavy-shot" hidden><div class="equipment-stage"><img src="assets/equipment/heavy-shot-field.webp" alt="Фото HEAVY SHOT" width="960" height="540" decoding="async"></div><figcaption><span>Повітряна платформа</span><strong>HEAVY SHOT</strong></figcaption></figure><figure class="equipment-slide" data-equipment="nrk" hidden><div class="equipment-stage"><img src="assets/equipment/nrk-photo.png" alt="Фото НРК" width="960" height="540" decoding="async"></div><figcaption><span>Наземна платформа</span><strong>НРК</strong></figcaption></figure></div><div class="showcase-controls" aria-label="Обрати техніку"><button type="button" data-showcase-index="0" aria-pressed="true">Вампір</button><button type="button" data-showcase-index="1" aria-pressed="false">HEAVY SHOT</button><button type="button" data-showcase-index="2" aria-pressed="false">НРК</button></div></section></section><div class="section-title-row"><h2 class="section-heading">Зведення журналу</h2><span>Дані спільного простору</span></div>
+    <section class="overview-hero" aria-labelledby="overviewHeroTitle"><div class="hero-copy"><p class="hero-kicker"><span></span> СПІЛЬНИЙ ЖУРНАЛ КОМАНДИ</p><h2 id="overviewHeroTitle">Ваш робочий простір.<br><em>Усе під контролем.</em></h2><p>Записи, техніка та звітність.<br>Злагоджена робота починається з порядку.</p><div class="hero-actions"><button class="btn primary" type="button" data-view="records">Відкрити журнал <span aria-hidden="true">↗</span></button><button class="hero-text-link" type="button" data-view="archive" id="heroArchiveLink" hidden>Архів зведень <span aria-hidden="true">→</span></button></div></div><section class="equipment-showcase" aria-label="Техніка команди"><div class="showcase-caption">ТЕХНІКА КОМАНДИ <span aria-hidden="true">↗</span></div><div class="equipment-slides"><figure class="equipment-slide" data-equipment="vampire"><div class="equipment-stage"><img src="assets/equipment/vampire-photo.png" alt="Фото Вампір" width="960" height="540" decoding="async"></div><figcaption><span>Повітряна платформа</span><strong>Вампір</strong></figcaption></figure><figure class="equipment-slide" data-equipment="heavy-shot" hidden><div class="equipment-stage"><img src="assets/equipment/heavy-shot-field.webp" alt="Фото HEAVY SHOT" width="960" height="540" decoding="async"></div><figcaption><span>Повітряна платформа</span><strong>HEAVY SHOT</strong></figcaption></figure><figure class="equipment-slide" data-equipment="nrk" hidden><div class="equipment-stage"><img src="assets/equipment/nrk-user-platform.png" alt="Фото НРК" width="960" height="540" decoding="async"></div><figcaption><span>Наземна платформа</span><strong>НРК</strong></figcaption></figure></div><div class="showcase-controls" aria-label="Обрати техніку"><button type="button" data-showcase-index="0" aria-pressed="true">Вампір</button><button type="button" data-showcase-index="1" aria-pressed="false">HEAVY SHOT</button><button type="button" data-showcase-index="2" aria-pressed="false">НРК</button></div></section></section><div class="section-title-row"><h2 class="section-heading">Зведення журналу</h2><span>Дані спільного простору</span></div>
     <section class="stats content-anchor" id="overview" aria-label="Зведення">
       <div class="stat"><span>Усього рейсів</span><strong id="totalStat">0</strong></div>
       <div class="stat"><span>За вибраний період</span><strong id="periodStat">0</strong></div>
@@ -443,7 +444,7 @@
     }
     function renderEquipment(){
       const images={
-        'НРК':{src:'assets/equipment/nrk-photo.png',alt:'Фото НРК',width:877,height:494},
+        'НРК':{src:'assets/equipment/nrk-user-platform.png',alt:'Фото НРК',width:800,height:600},
         'Вампір':{src:'assets/equipment/vampire-photo.png',alt:'Фото Вампір',width:982,height:637},
         'HEAVY SHOT':{src:'assets/equipment/heavy-shot-field.webp',alt:'Фото HEAVY SHOT',width:1716,height:916}
       };
@@ -541,5 +542,6 @@
   <script src="assets/site-assistant.js?v=free-20261023"></script>
   <script src="assets/depth-motion.js?v=20261023"></script>
   <script src="assets/equipment-showcase.js?v=photo-20261024"></script>
+  <script src="assets/nrk-wheels.js?v=20261024"></script>
 </body>
 </html>
